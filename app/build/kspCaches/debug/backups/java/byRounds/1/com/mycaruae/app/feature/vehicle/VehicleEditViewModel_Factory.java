@@ -3,6 +3,7 @@ package com.mycaruae.app.feature.vehicle;
 import com.mycaruae.app.data.datastore.UserPreferences;
 import com.mycaruae.app.data.repository.BrandRepository;
 import com.mycaruae.app.data.repository.EmirateRepository;
+import com.mycaruae.app.data.repository.ReminderRepository;
 import com.mycaruae.app.data.repository.VehicleRepository;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
@@ -32,34 +33,39 @@ public final class VehicleEditViewModel_Factory implements Factory<VehicleEditVi
 
   private final Provider<EmirateRepository> emirateRepositoryProvider;
 
+  private final Provider<ReminderRepository> reminderRepositoryProvider;
+
   private final Provider<UserPreferences> userPreferencesProvider;
 
   public VehicleEditViewModel_Factory(Provider<VehicleRepository> vehicleRepositoryProvider,
       Provider<BrandRepository> brandRepositoryProvider,
       Provider<EmirateRepository> emirateRepositoryProvider,
+      Provider<ReminderRepository> reminderRepositoryProvider,
       Provider<UserPreferences> userPreferencesProvider) {
     this.vehicleRepositoryProvider = vehicleRepositoryProvider;
     this.brandRepositoryProvider = brandRepositoryProvider;
     this.emirateRepositoryProvider = emirateRepositoryProvider;
+    this.reminderRepositoryProvider = reminderRepositoryProvider;
     this.userPreferencesProvider = userPreferencesProvider;
   }
 
   @Override
   public VehicleEditViewModel get() {
-    return newInstance(vehicleRepositoryProvider.get(), brandRepositoryProvider.get(), emirateRepositoryProvider.get(), userPreferencesProvider.get());
+    return newInstance(vehicleRepositoryProvider.get(), brandRepositoryProvider.get(), emirateRepositoryProvider.get(), reminderRepositoryProvider.get(), userPreferencesProvider.get());
   }
 
   public static VehicleEditViewModel_Factory create(
       Provider<VehicleRepository> vehicleRepositoryProvider,
       Provider<BrandRepository> brandRepositoryProvider,
       Provider<EmirateRepository> emirateRepositoryProvider,
+      Provider<ReminderRepository> reminderRepositoryProvider,
       Provider<UserPreferences> userPreferencesProvider) {
-    return new VehicleEditViewModel_Factory(vehicleRepositoryProvider, brandRepositoryProvider, emirateRepositoryProvider, userPreferencesProvider);
+    return new VehicleEditViewModel_Factory(vehicleRepositoryProvider, brandRepositoryProvider, emirateRepositoryProvider, reminderRepositoryProvider, userPreferencesProvider);
   }
 
   public static VehicleEditViewModel newInstance(VehicleRepository vehicleRepository,
       BrandRepository brandRepository, EmirateRepository emirateRepository,
-      UserPreferences userPreferences) {
-    return new VehicleEditViewModel(vehicleRepository, brandRepository, emirateRepository, userPreferences);
+      ReminderRepository reminderRepository, UserPreferences userPreferences) {
+    return new VehicleEditViewModel(vehicleRepository, brandRepository, emirateRepository, reminderRepository, userPreferences);
   }
 }

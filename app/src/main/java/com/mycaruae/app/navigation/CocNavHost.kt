@@ -139,6 +139,11 @@ fun CocNavHost(
         composable(Screen.Profile.route) {
             SettingsScreen(
                 onNavigateBack = { navController.popBackStack() },
+                onLoggedOut = {
+                    navController.navigate(Screen.Onboarding.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
             )
         }
 
@@ -165,7 +170,14 @@ fun CocNavHost(
             RegistrationRenewScreen(onNavigateBack = { navController.popBackStack() })
         }
         composable(Screen.Settings.route) {
-            SettingsScreen(onNavigateBack = { navController.popBackStack() })
+            SettingsScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onLoggedOut = {
+                    navController.navigate(Screen.Onboarding.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
+            )
         }
     }
 }

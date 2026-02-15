@@ -28,10 +28,9 @@ data class ReminderCreateUiState(
 )
 
 enum class ReminderType(val displayName: String) {
-    REGISTRATION("Registration Expiry"),
-    INSPECTION("Inspection Expiry"),
     OIL_CHANGE("Oil Change"),
     TIRE_ROTATION("Tire Rotation"),
+    BRAKE_SERVICE("Brake Service"),
     INSURANCE("Insurance Renewal"),
     CUSTOM("Custom"),
 }

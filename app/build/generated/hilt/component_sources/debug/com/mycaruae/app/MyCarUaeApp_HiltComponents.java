@@ -12,6 +12,7 @@ import com.mycaruae.app.feature.mileage.MileageEntryViewModel_HiltModules;
 import com.mycaruae.app.feature.mileage.MileageHistoryViewModel_HiltModules;
 import com.mycaruae.app.feature.reminders.ReminderCreateViewModel_HiltModules;
 import com.mycaruae.app.feature.reminders.RemindersViewModel_HiltModules;
+import com.mycaruae.app.feature.settings.SettingsViewModel_HiltModules;
 import com.mycaruae.app.feature.splash.SplashViewModel_HiltModules;
 import com.mycaruae.app.feature.vehicle.VehicleAddViewModel_HiltModules;
 import com.mycaruae.app.feature.vehicle.VehicleEditViewModel_HiltModules;
@@ -183,6 +184,7 @@ public final class MyCarUaeApp_HiltComponents {
           ViewModelCBuilderModule.class,
           ReminderCreateViewModel_HiltModules.KeyModule.class,
           RemindersViewModel_HiltModules.KeyModule.class,
+          SettingsViewModel_HiltModules.KeyModule.class,
           SplashViewModel_HiltModules.KeyModule.class,
           VehicleAddViewModel_HiltModules.KeyModule.class,
           VehicleEditViewModel_HiltModules.KeyModule.class
@@ -231,6 +233,7 @@ public final class MyCarUaeApp_HiltComponents {
           MileageHistoryViewModel_HiltModules.BindsModule.class,
           ReminderCreateViewModel_HiltModules.BindsModule.class,
           RemindersViewModel_HiltModules.BindsModule.class,
+          SettingsViewModel_HiltModules.BindsModule.class,
           SplashViewModel_HiltModules.BindsModule.class,
           VehicleAddViewModel_HiltModules.BindsModule.class,
           VehicleEditViewModel_HiltModules.BindsModule.class

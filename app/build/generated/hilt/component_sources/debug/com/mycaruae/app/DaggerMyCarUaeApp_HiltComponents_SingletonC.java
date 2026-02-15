@@ -54,6 +54,8 @@ import com.mycaruae.app.feature.reminders.ReminderCreateViewModel;
 import com.mycaruae.app.feature.reminders.ReminderCreateViewModel_HiltModules;
 import com.mycaruae.app.feature.reminders.RemindersViewModel;
 import com.mycaruae.app.feature.reminders.RemindersViewModel_HiltModules;
+import com.mycaruae.app.feature.settings.SettingsViewModel;
+import com.mycaruae.app.feature.settings.SettingsViewModel_HiltModules;
 import com.mycaruae.app.feature.splash.SplashViewModel;
 import com.mycaruae.app.feature.splash.SplashViewModel_HiltModules;
 import com.mycaruae.app.feature.vehicle.VehicleAddViewModel;
@@ -425,7 +427,7 @@ public final class DaggerMyCarUaeApp_HiltComponents_SingletonC {
 
     @Override
     public Map<Class<?>, Boolean> getViewModelKeys() {
-      return LazyClassKeyMap.<Boolean>of(MapBuilder.<String, Boolean>newMapBuilder(12).put(LazyClassKeyProvider.com_mycaruae_app_feature_auth_AuthViewModel, AuthViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_mycaruae_app_feature_dashboard_DashboardViewModel, DashboardViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_mycaruae_app_feature_maintenance_MaintenanceAddViewModel, MaintenanceAddViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_mycaruae_app_feature_maintenance_MaintenanceDetailViewModel, MaintenanceDetailViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_mycaruae_app_feature_maintenance_MaintenanceHistoryViewModel, MaintenanceHistoryViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_mycaruae_app_feature_mileage_MileageEntryViewModel, MileageEntryViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_mycaruae_app_feature_mileage_MileageHistoryViewModel, MileageHistoryViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_mycaruae_app_feature_reminders_ReminderCreateViewModel, ReminderCreateViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_mycaruae_app_feature_reminders_RemindersViewModel, RemindersViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_mycaruae_app_feature_splash_SplashViewModel, SplashViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_mycaruae_app_feature_vehicle_VehicleAddViewModel, VehicleAddViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_mycaruae_app_feature_vehicle_VehicleEditViewModel, VehicleEditViewModel_HiltModules.KeyModule.provide()).build());
+      return LazyClassKeyMap.<Boolean>of(MapBuilder.<String, Boolean>newMapBuilder(13).put(LazyClassKeyProvider.com_mycaruae_app_feature_auth_AuthViewModel, AuthViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_mycaruae_app_feature_dashboard_DashboardViewModel, DashboardViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_mycaruae_app_feature_maintenance_MaintenanceAddViewModel, MaintenanceAddViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_mycaruae_app_feature_maintenance_MaintenanceDetailViewModel, MaintenanceDetailViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_mycaruae_app_feature_maintenance_MaintenanceHistoryViewModel, MaintenanceHistoryViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_mycaruae_app_feature_mileage_MileageEntryViewModel, MileageEntryViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_mycaruae_app_feature_mileage_MileageHistoryViewModel, MileageHistoryViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_mycaruae_app_feature_reminders_ReminderCreateViewModel, ReminderCreateViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_mycaruae_app_feature_reminders_RemindersViewModel, RemindersViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_mycaruae_app_feature_settings_SettingsViewModel, SettingsViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_mycaruae_app_feature_splash_SplashViewModel, SplashViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_mycaruae_app_feature_vehicle_VehicleAddViewModel, VehicleAddViewModel_HiltModules.KeyModule.provide()).put(LazyClassKeyProvider.com_mycaruae_app_feature_vehicle_VehicleEditViewModel, VehicleEditViewModel_HiltModules.KeyModule.provide()).build());
     }
 
     @Override
@@ -445,65 +447,70 @@ public final class DaggerMyCarUaeApp_HiltComponents_SingletonC {
 
     @IdentifierNameString
     private static final class LazyClassKeyProvider {
-      static String com_mycaruae_app_feature_auth_AuthViewModel = "com.mycaruae.app.feature.auth.AuthViewModel";
-
-      static String com_mycaruae_app_feature_splash_SplashViewModel = "com.mycaruae.app.feature.splash.SplashViewModel";
-
-      static String com_mycaruae_app_feature_reminders_RemindersViewModel = "com.mycaruae.app.feature.reminders.RemindersViewModel";
+      static String com_mycaruae_app_feature_dashboard_DashboardViewModel = "com.mycaruae.app.feature.dashboard.DashboardViewModel";
 
       static String com_mycaruae_app_feature_maintenance_MaintenanceDetailViewModel = "com.mycaruae.app.feature.maintenance.MaintenanceDetailViewModel";
 
-      static String com_mycaruae_app_feature_mileage_MileageEntryViewModel = "com.mycaruae.app.feature.mileage.MileageEntryViewModel";
+      static String com_mycaruae_app_feature_reminders_ReminderCreateViewModel = "com.mycaruae.app.feature.reminders.ReminderCreateViewModel";
 
-      static String com_mycaruae_app_feature_dashboard_DashboardViewModel = "com.mycaruae.app.feature.dashboard.DashboardViewModel";
-
-      static String com_mycaruae_app_feature_mileage_MileageHistoryViewModel = "com.mycaruae.app.feature.mileage.MileageHistoryViewModel";
-
-      static String com_mycaruae_app_feature_vehicle_VehicleAddViewModel = "com.mycaruae.app.feature.vehicle.VehicleAddViewModel";
-
-      static String com_mycaruae_app_feature_maintenance_MaintenanceAddViewModel = "com.mycaruae.app.feature.maintenance.MaintenanceAddViewModel";
-
-      static String com_mycaruae_app_feature_maintenance_MaintenanceHistoryViewModel = "com.mycaruae.app.feature.maintenance.MaintenanceHistoryViewModel";
+      static String com_mycaruae_app_feature_splash_SplashViewModel = "com.mycaruae.app.feature.splash.SplashViewModel";
 
       static String com_mycaruae_app_feature_vehicle_VehicleEditViewModel = "com.mycaruae.app.feature.vehicle.VehicleEditViewModel";
 
-      static String com_mycaruae_app_feature_reminders_ReminderCreateViewModel = "com.mycaruae.app.feature.reminders.ReminderCreateViewModel";
+      static String com_mycaruae_app_feature_mileage_MileageEntryViewModel = "com.mycaruae.app.feature.mileage.MileageEntryViewModel";
 
-      @KeepFieldType
-      AuthViewModel com_mycaruae_app_feature_auth_AuthViewModel2;
+      static String com_mycaruae_app_feature_reminders_RemindersViewModel = "com.mycaruae.app.feature.reminders.RemindersViewModel";
 
-      @KeepFieldType
-      SplashViewModel com_mycaruae_app_feature_splash_SplashViewModel2;
+      static String com_mycaruae_app_feature_settings_SettingsViewModel = "com.mycaruae.app.feature.settings.SettingsViewModel";
 
-      @KeepFieldType
-      RemindersViewModel com_mycaruae_app_feature_reminders_RemindersViewModel2;
+      static String com_mycaruae_app_feature_maintenance_MaintenanceAddViewModel = "com.mycaruae.app.feature.maintenance.MaintenanceAddViewModel";
 
-      @KeepFieldType
-      MaintenanceDetailViewModel com_mycaruae_app_feature_maintenance_MaintenanceDetailViewModel2;
+      static String com_mycaruae_app_feature_vehicle_VehicleAddViewModel = "com.mycaruae.app.feature.vehicle.VehicleAddViewModel";
 
-      @KeepFieldType
-      MileageEntryViewModel com_mycaruae_app_feature_mileage_MileageEntryViewModel2;
+      static String com_mycaruae_app_feature_maintenance_MaintenanceHistoryViewModel = "com.mycaruae.app.feature.maintenance.MaintenanceHistoryViewModel";
+
+      static String com_mycaruae_app_feature_mileage_MileageHistoryViewModel = "com.mycaruae.app.feature.mileage.MileageHistoryViewModel";
+
+      static String com_mycaruae_app_feature_auth_AuthViewModel = "com.mycaruae.app.feature.auth.AuthViewModel";
 
       @KeepFieldType
       DashboardViewModel com_mycaruae_app_feature_dashboard_DashboardViewModel2;
 
       @KeepFieldType
-      MileageHistoryViewModel com_mycaruae_app_feature_mileage_MileageHistoryViewModel2;
+      MaintenanceDetailViewModel com_mycaruae_app_feature_maintenance_MaintenanceDetailViewModel2;
 
       @KeepFieldType
-      VehicleAddViewModel com_mycaruae_app_feature_vehicle_VehicleAddViewModel2;
+      ReminderCreateViewModel com_mycaruae_app_feature_reminders_ReminderCreateViewModel2;
 
       @KeepFieldType
-      MaintenanceAddViewModel com_mycaruae_app_feature_maintenance_MaintenanceAddViewModel2;
-
-      @KeepFieldType
-      MaintenanceHistoryViewModel com_mycaruae_app_feature_maintenance_MaintenanceHistoryViewModel2;
+      SplashViewModel com_mycaruae_app_feature_splash_SplashViewModel2;
 
       @KeepFieldType
       VehicleEditViewModel com_mycaruae_app_feature_vehicle_VehicleEditViewModel2;
 
       @KeepFieldType
-      ReminderCreateViewModel com_mycaruae_app_feature_reminders_ReminderCreateViewModel2;
+      MileageEntryViewModel com_mycaruae_app_feature_mileage_MileageEntryViewModel2;
+
+      @KeepFieldType
+      RemindersViewModel com_mycaruae_app_feature_reminders_RemindersViewModel2;
+
+      @KeepFieldType
+      SettingsViewModel com_mycaruae_app_feature_settings_SettingsViewModel2;
+
+      @KeepFieldType
+      MaintenanceAddViewModel com_mycaruae_app_feature_maintenance_MaintenanceAddViewModel2;
+
+      @KeepFieldType
+      VehicleAddViewModel com_mycaruae_app_feature_vehicle_VehicleAddViewModel2;
+
+      @KeepFieldType
+      MaintenanceHistoryViewModel com_mycaruae_app_feature_maintenance_MaintenanceHistoryViewModel2;
+
+      @KeepFieldType
+      MileageHistoryViewModel com_mycaruae_app_feature_mileage_MileageHistoryViewModel2;
+
+      @KeepFieldType
+      AuthViewModel com_mycaruae_app_feature_auth_AuthViewModel2;
     }
   }
 
@@ -534,6 +541,8 @@ public final class DaggerMyCarUaeApp_HiltComponents_SingletonC {
 
     private Provider<RemindersViewModel> remindersViewModelProvider;
 
+    private Provider<SettingsViewModel> settingsViewModelProvider;
+
     private Provider<SplashViewModel> splashViewModelProvider;
 
     private Provider<VehicleAddViewModel> vehicleAddViewModelProvider;
@@ -562,14 +571,15 @@ public final class DaggerMyCarUaeApp_HiltComponents_SingletonC {
       this.mileageHistoryViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 6);
       this.reminderCreateViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 7);
       this.remindersViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 8);
-      this.splashViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 9);
-      this.vehicleAddViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 10);
-      this.vehicleEditViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 11);
+      this.settingsViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 9);
+      this.splashViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 10);
+      this.vehicleAddViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 11);
+      this.vehicleEditViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 12);
     }
 
     @Override
     public Map<Class<?>, javax.inject.Provider<ViewModel>> getHiltViewModelMap() {
-      return LazyClassKeyMap.<javax.inject.Provider<ViewModel>>of(MapBuilder.<String, javax.inject.Provider<ViewModel>>newMapBuilder(12).put(LazyClassKeyProvider.com_mycaruae_app_feature_auth_AuthViewModel, ((Provider) authViewModelProvider)).put(LazyClassKeyProvider.com_mycaruae_app_feature_dashboard_DashboardViewModel, ((Provider) dashboardViewModelProvider)).put(LazyClassKeyProvider.com_mycaruae_app_feature_maintenance_MaintenanceAddViewModel, ((Provider) maintenanceAddViewModelProvider)).put(LazyClassKeyProvider.com_mycaruae_app_feature_maintenance_MaintenanceDetailViewModel, ((Provider) maintenanceDetailViewModelProvider)).put(LazyClassKeyProvider.com_mycaruae_app_feature_maintenance_MaintenanceHistoryViewModel, ((Provider) maintenanceHistoryViewModelProvider)).put(LazyClassKeyProvider.com_mycaruae_app_feature_mileage_MileageEntryViewModel, ((Provider) mileageEntryViewModelProvider)).put(LazyClassKeyProvider.com_mycaruae_app_feature_mileage_MileageHistoryViewModel, ((Provider) mileageHistoryViewModelProvider)).put(LazyClassKeyProvider.com_mycaruae_app_feature_reminders_ReminderCreateViewModel, ((Provider) reminderCreateViewModelProvider)).put(LazyClassKeyProvider.com_mycaruae_app_feature_reminders_RemindersViewModel, ((Provider) remindersViewModelProvider)).put(LazyClassKeyProvider.com_mycaruae_app_feature_splash_SplashViewModel, ((Provider) splashViewModelProvider)).put(LazyClassKeyProvider.com_mycaruae_app_feature_vehicle_VehicleAddViewModel, ((Provider) vehicleAddViewModelProvider)).put(LazyClassKeyProvider.com_mycaruae_app_feature_vehicle_VehicleEditViewModel, ((Provider) vehicleEditViewModelProvider)).build());
+      return LazyClassKeyMap.<javax.inject.Provider<ViewModel>>of(MapBuilder.<String, javax.inject.Provider<ViewModel>>newMapBuilder(13).put(LazyClassKeyProvider.com_mycaruae_app_feature_auth_AuthViewModel, ((Provider) authViewModelProvider)).put(LazyClassKeyProvider.com_mycaruae_app_feature_dashboard_DashboardViewModel, ((Provider) dashboardViewModelProvider)).put(LazyClassKeyProvider.com_mycaruae_app_feature_maintenance_MaintenanceAddViewModel, ((Provider) maintenanceAddViewModelProvider)).put(LazyClassKeyProvider.com_mycaruae_app_feature_maintenance_MaintenanceDetailViewModel, ((Provider) maintenanceDetailViewModelProvider)).put(LazyClassKeyProvider.com_mycaruae_app_feature_maintenance_MaintenanceHistoryViewModel, ((Provider) maintenanceHistoryViewModelProvider)).put(LazyClassKeyProvider.com_mycaruae_app_feature_mileage_MileageEntryViewModel, ((Provider) mileageEntryViewModelProvider)).put(LazyClassKeyProvider.com_mycaruae_app_feature_mileage_MileageHistoryViewModel, ((Provider) mileageHistoryViewModelProvider)).put(LazyClassKeyProvider.com_mycaruae_app_feature_reminders_ReminderCreateViewModel, ((Provider) reminderCreateViewModelProvider)).put(LazyClassKeyProvider.com_mycaruae_app_feature_reminders_RemindersViewModel, ((Provider) remindersViewModelProvider)).put(LazyClassKeyProvider.com_mycaruae_app_feature_settings_SettingsViewModel, ((Provider) settingsViewModelProvider)).put(LazyClassKeyProvider.com_mycaruae_app_feature_splash_SplashViewModel, ((Provider) splashViewModelProvider)).put(LazyClassKeyProvider.com_mycaruae_app_feature_vehicle_VehicleAddViewModel, ((Provider) vehicleAddViewModelProvider)).put(LazyClassKeyProvider.com_mycaruae_app_feature_vehicle_VehicleEditViewModel, ((Provider) vehicleEditViewModelProvider)).build());
     }
 
     @Override
@@ -579,32 +589,52 @@ public final class DaggerMyCarUaeApp_HiltComponents_SingletonC {
 
     @IdentifierNameString
     private static final class LazyClassKeyProvider {
-      static String com_mycaruae_app_feature_auth_AuthViewModel = "com.mycaruae.app.feature.auth.AuthViewModel";
+      static String com_mycaruae_app_feature_mileage_MileageHistoryViewModel = "com.mycaruae.app.feature.mileage.MileageHistoryViewModel";
+
+      static String com_mycaruae_app_feature_mileage_MileageEntryViewModel = "com.mycaruae.app.feature.mileage.MileageEntryViewModel";
+
+      static String com_mycaruae_app_feature_vehicle_VehicleEditViewModel = "com.mycaruae.app.feature.vehicle.VehicleEditViewModel";
+
+      static String com_mycaruae_app_feature_reminders_RemindersViewModel = "com.mycaruae.app.feature.reminders.RemindersViewModel";
+
+      static String com_mycaruae_app_feature_dashboard_DashboardViewModel = "com.mycaruae.app.feature.dashboard.DashboardViewModel";
+
+      static String com_mycaruae_app_feature_settings_SettingsViewModel = "com.mycaruae.app.feature.settings.SettingsViewModel";
+
+      static String com_mycaruae_app_feature_reminders_ReminderCreateViewModel = "com.mycaruae.app.feature.reminders.ReminderCreateViewModel";
 
       static String com_mycaruae_app_feature_splash_SplashViewModel = "com.mycaruae.app.feature.splash.SplashViewModel";
 
       static String com_mycaruae_app_feature_vehicle_VehicleAddViewModel = "com.mycaruae.app.feature.vehicle.VehicleAddViewModel";
 
-      static String com_mycaruae_app_feature_mileage_MileageEntryViewModel = "com.mycaruae.app.feature.mileage.MileageEntryViewModel";
-
-      static String com_mycaruae_app_feature_dashboard_DashboardViewModel = "com.mycaruae.app.feature.dashboard.DashboardViewModel";
-
-      static String com_mycaruae_app_feature_maintenance_MaintenanceHistoryViewModel = "com.mycaruae.app.feature.maintenance.MaintenanceHistoryViewModel";
-
-      static String com_mycaruae_app_feature_reminders_RemindersViewModel = "com.mycaruae.app.feature.reminders.RemindersViewModel";
-
-      static String com_mycaruae_app_feature_vehicle_VehicleEditViewModel = "com.mycaruae.app.feature.vehicle.VehicleEditViewModel";
-
-      static String com_mycaruae_app_feature_mileage_MileageHistoryViewModel = "com.mycaruae.app.feature.mileage.MileageHistoryViewModel";
+      static String com_mycaruae_app_feature_auth_AuthViewModel = "com.mycaruae.app.feature.auth.AuthViewModel";
 
       static String com_mycaruae_app_feature_maintenance_MaintenanceDetailViewModel = "com.mycaruae.app.feature.maintenance.MaintenanceDetailViewModel";
 
       static String com_mycaruae_app_feature_maintenance_MaintenanceAddViewModel = "com.mycaruae.app.feature.maintenance.MaintenanceAddViewModel";
 
-      static String com_mycaruae_app_feature_reminders_ReminderCreateViewModel = "com.mycaruae.app.feature.reminders.ReminderCreateViewModel";
+      static String com_mycaruae_app_feature_maintenance_MaintenanceHistoryViewModel = "com.mycaruae.app.feature.maintenance.MaintenanceHistoryViewModel";
 
       @KeepFieldType
-      AuthViewModel com_mycaruae_app_feature_auth_AuthViewModel2;
+      MileageHistoryViewModel com_mycaruae_app_feature_mileage_MileageHistoryViewModel2;
+
+      @KeepFieldType
+      MileageEntryViewModel com_mycaruae_app_feature_mileage_MileageEntryViewModel2;
+
+      @KeepFieldType
+      VehicleEditViewModel com_mycaruae_app_feature_vehicle_VehicleEditViewModel2;
+
+      @KeepFieldType
+      RemindersViewModel com_mycaruae_app_feature_reminders_RemindersViewModel2;
+
+      @KeepFieldType
+      DashboardViewModel com_mycaruae_app_feature_dashboard_DashboardViewModel2;
+
+      @KeepFieldType
+      SettingsViewModel com_mycaruae_app_feature_settings_SettingsViewModel2;
+
+      @KeepFieldType
+      ReminderCreateViewModel com_mycaruae_app_feature_reminders_ReminderCreateViewModel2;
 
       @KeepFieldType
       SplashViewModel com_mycaruae_app_feature_splash_SplashViewModel2;
@@ -613,22 +643,7 @@ public final class DaggerMyCarUaeApp_HiltComponents_SingletonC {
       VehicleAddViewModel com_mycaruae_app_feature_vehicle_VehicleAddViewModel2;
 
       @KeepFieldType
-      MileageEntryViewModel com_mycaruae_app_feature_mileage_MileageEntryViewModel2;
-
-      @KeepFieldType
-      DashboardViewModel com_mycaruae_app_feature_dashboard_DashboardViewModel2;
-
-      @KeepFieldType
-      MaintenanceHistoryViewModel com_mycaruae_app_feature_maintenance_MaintenanceHistoryViewModel2;
-
-      @KeepFieldType
-      RemindersViewModel com_mycaruae_app_feature_reminders_RemindersViewModel2;
-
-      @KeepFieldType
-      VehicleEditViewModel com_mycaruae_app_feature_vehicle_VehicleEditViewModel2;
-
-      @KeepFieldType
-      MileageHistoryViewModel com_mycaruae_app_feature_mileage_MileageHistoryViewModel2;
+      AuthViewModel com_mycaruae_app_feature_auth_AuthViewModel2;
 
       @KeepFieldType
       MaintenanceDetailViewModel com_mycaruae_app_feature_maintenance_MaintenanceDetailViewModel2;
@@ -637,7 +652,7 @@ public final class DaggerMyCarUaeApp_HiltComponents_SingletonC {
       MaintenanceAddViewModel com_mycaruae_app_feature_maintenance_MaintenanceAddViewModel2;
 
       @KeepFieldType
-      ReminderCreateViewModel com_mycaruae_app_feature_reminders_ReminderCreateViewModel2;
+      MaintenanceHistoryViewModel com_mycaruae_app_feature_maintenance_MaintenanceHistoryViewModel2;
     }
 
     private static final class SwitchingProvider<T> implements Provider<T> {
@@ -688,14 +703,17 @@ public final class DaggerMyCarUaeApp_HiltComponents_SingletonC {
           case 8: // com.mycaruae.app.feature.reminders.RemindersViewModel 
           return (T) new RemindersViewModel(singletonCImpl.reminderRepositoryProvider.get(), singletonCImpl.vehicleRepositoryProvider.get(), singletonCImpl.userPreferencesProvider.get());
 
-          case 9: // com.mycaruae.app.feature.splash.SplashViewModel 
+          case 9: // com.mycaruae.app.feature.settings.SettingsViewModel 
+          return (T) new SettingsViewModel(singletonCImpl.userPreferencesProvider.get(), singletonCImpl.vehicleRepositoryProvider.get(), singletonCImpl.reminderRepositoryProvider.get());
+
+          case 10: // com.mycaruae.app.feature.splash.SplashViewModel 
           return (T) new SplashViewModel(singletonCImpl.userPreferencesProvider.get());
 
-          case 10: // com.mycaruae.app.feature.vehicle.VehicleAddViewModel 
-          return (T) new VehicleAddViewModel(singletonCImpl.vehicleRepositoryProvider.get(), singletonCImpl.brandRepositoryProvider.get(), singletonCImpl.emirateRepositoryProvider.get(), singletonCImpl.userPreferencesProvider.get());
+          case 11: // com.mycaruae.app.feature.vehicle.VehicleAddViewModel 
+          return (T) new VehicleAddViewModel(singletonCImpl.vehicleRepositoryProvider.get(), singletonCImpl.brandRepositoryProvider.get(), singletonCImpl.emirateRepositoryProvider.get(), singletonCImpl.reminderRepositoryProvider.get(), singletonCImpl.userPreferencesProvider.get());
 
-          case 11: // com.mycaruae.app.feature.vehicle.VehicleEditViewModel 
-          return (T) new VehicleEditViewModel(singletonCImpl.vehicleRepositoryProvider.get(), singletonCImpl.brandRepositoryProvider.get(), singletonCImpl.emirateRepositoryProvider.get(), singletonCImpl.userPreferencesProvider.get());
+          case 12: // com.mycaruae.app.feature.vehicle.VehicleEditViewModel 
+          return (T) new VehicleEditViewModel(singletonCImpl.vehicleRepositoryProvider.get(), singletonCImpl.brandRepositoryProvider.get(), singletonCImpl.emirateRepositoryProvider.get(), singletonCImpl.reminderRepositoryProvider.get(), singletonCImpl.userPreferencesProvider.get());
 
           default: throw new AssertionError(id);
         }

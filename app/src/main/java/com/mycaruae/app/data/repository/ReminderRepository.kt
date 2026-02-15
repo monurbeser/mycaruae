@@ -74,12 +74,24 @@ class ReminderRepository @Inject constructor(
         )
     }
 
-    suspend fun generateExpiryReminders(vehicleId: String, expiryDate: Long, type: String, title: String) {
-        val daysBefore = listOf(60, 30, 14, 7, 3, 1, 0)
+    suspend fun clearAutoReminders(vehicleId: String, type: String) {
+        reminderDao.deleteAutoByType(vehicleId, type)
+    }
+
+    suspend fun generateExpiryReminders(
+        vehicleId: String,
+        expiryDate: Long,
+        type: String,
+        title: String,
+        notificationDays: Set<Int>,
+    ) {
+        // Clear existing auto-reminders for this type first
+        clearAutoReminders(vehicleId, type)
+
         val now = System.currentTimeMillis()
         val dayMillis = 86_400_000L
 
-        val reminders = daysBefore.map { days ->
+        val reminders = notificationDays.map { days ->
             val dueDate = expiryDate - (days * dayMillis)
             val reminderTitle = if (days == 0) "$title expires today!" else "$title expires in $days days"
             ReminderEntity(

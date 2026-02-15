@@ -9,6 +9,7 @@ import com.mycaruae.app.data.database.entity.VehicleEntity
 import com.mycaruae.app.data.datastore.UserPreferences
 import com.mycaruae.app.data.repository.BrandRepository
 import com.mycaruae.app.data.repository.EmirateRepository
+import com.mycaruae.app.data.repository.ReminderRepository
 import com.mycaruae.app.data.repository.VehicleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,6 +38,8 @@ data class VehicleEditUiState(
     val inspectionExpiry: Long = 0L,
     val registrationExpiryText: String = "",
     val inspectionExpiryText: String = "",
+    val originalRegistrationExpiry: Long = 0L,
+    val originalInspectionExpiry: Long = 0L,
     val photoUris: List<Uri> = emptyList(),
     val color: String = "",
     val currentMileage: String = "",
@@ -52,6 +55,7 @@ class VehicleEditViewModel @Inject constructor(
     private val vehicleRepository: VehicleRepository,
     private val brandRepository: BrandRepository,
     private val emirateRepository: EmirateRepository,
+    private val reminderRepository: ReminderRepository,
     private val userPreferences: UserPreferences,
 ) : ViewModel() {
 
@@ -100,6 +104,8 @@ class VehicleEditViewModel @Inject constructor(
                         inspectionExpiry = vehicle.inspectionExpiry,
                         registrationExpiryText = dateFormatter.format(Date(vehicle.registrationExpiry)),
                         inspectionExpiryText = dateFormatter.format(Date(vehicle.inspectionExpiry)),
+                        originalRegistrationExpiry = vehicle.registrationExpiry,
+                        originalInspectionExpiry = vehicle.inspectionExpiry,
                         photoUris = photos,
                         color = vehicle.color ?: "",
                         currentMileage = if (vehicle.currentMileage > 0) vehicle.currentMileage.toString() else "",
@@ -185,6 +191,7 @@ class VehicleEditViewModel @Inject constructor(
 
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
+            val userData = userPreferences.userData.first()
             val now = System.currentTimeMillis()
             val photoUrisString = state.photoUris
                 .takeIf { it.isNotEmpty() }
@@ -192,7 +199,7 @@ class VehicleEditViewModel @Inject constructor(
 
             val updated = VehicleEntity(
                 id = state.vehicleId,
-                userId = userPreferences.userData.first().userId,
+                userId = userData.userId,
                 brandId = state.selectedBrandId,
                 modelId = state.modelName,
                 year = yearInt,
@@ -205,10 +212,32 @@ class VehicleEditViewModel @Inject constructor(
                 currentMileage = state.currentMileage.toIntOrNull() ?: 0,
                 photoUris = photoUrisString,
                 pendingSync = true,
-                createdAt = now, // keeps original ideally, but OK for MVP
+                createdAt = now,
                 updatedAt = now,
             )
             vehicleRepository.updateVehicle(updated)
+
+            // Regenerate reminders if expiry dates changed
+            val notificationDays = userData.notificationDays
+            if (state.registrationExpiry != state.originalRegistrationExpiry) {
+                reminderRepository.generateExpiryReminders(
+                    vehicleId = state.vehicleId,
+                    expiryDate = state.registrationExpiry,
+                    type = "REGISTRATION",
+                    title = "Registration",
+                    notificationDays = notificationDays,
+                )
+            }
+            if (state.inspectionExpiry != state.originalInspectionExpiry) {
+                reminderRepository.generateExpiryReminders(
+                    vehicleId = state.vehicleId,
+                    expiryDate = state.inspectionExpiry,
+                    type = "INSPECTION",
+                    title = "Inspection",
+                    notificationDays = notificationDays,
+                )
+            }
+
             _uiState.update { it.copy(isLoading = false, isSaved = true) }
         }
     }

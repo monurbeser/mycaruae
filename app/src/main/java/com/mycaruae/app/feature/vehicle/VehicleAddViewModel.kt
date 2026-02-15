@@ -9,6 +9,7 @@ import com.mycaruae.app.data.database.entity.VehicleEntity
 import com.mycaruae.app.data.datastore.UserPreferences
 import com.mycaruae.app.data.repository.BrandRepository
 import com.mycaruae.app.data.repository.EmirateRepository
+import com.mycaruae.app.data.repository.ReminderRepository
 import com.mycaruae.app.data.repository.VehicleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -55,6 +56,7 @@ class VehicleAddViewModel @Inject constructor(
     private val vehicleRepository: VehicleRepository,
     private val brandRepository: BrandRepository,
     private val emirateRepository: EmirateRepository,
+    private val reminderRepository: ReminderRepository,
     private val userPreferences: UserPreferences,
 ) : ViewModel() {
 
@@ -167,15 +169,18 @@ class VehicleAddViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
             val state = _uiState.value
-            val userId = userPreferences.userData.first().userId
+            val userData = userPreferences.userData.first()
+            val userId = userData.userId
             val now = System.currentTimeMillis()
 
             val photoUrisString = state.photoUris
                 .takeIf { it.isNotEmpty() }
                 ?.joinToString(",") { it.toString() }
 
+            val vehicleId = vehicleRepository.generateId()
+
             val vehicle = VehicleEntity(
-                id = vehicleRepository.generateId(),
+                id = vehicleId,
                 userId = userId,
                 brandId = state.selectedBrandId,
                 modelId = state.modelName,
@@ -194,6 +199,24 @@ class VehicleAddViewModel @Inject constructor(
             )
 
             vehicleRepository.addVehicle(vehicle)
+
+            // Auto-generate reminder chains based on user's notification preferences
+            val notificationDays = userData.notificationDays
+            reminderRepository.generateExpiryReminders(
+                vehicleId = vehicleId,
+                expiryDate = state.registrationExpiry,
+                type = "REGISTRATION",
+                title = "Registration",
+                notificationDays = notificationDays,
+            )
+            reminderRepository.generateExpiryReminders(
+                vehicleId = vehicleId,
+                expiryDate = state.inspectionExpiry,
+                type = "INSPECTION",
+                title = "Inspection",
+                notificationDays = notificationDays,
+            )
+
             _uiState.update { it.copy(isLoading = false, isSaved = true) }
         }
     }
