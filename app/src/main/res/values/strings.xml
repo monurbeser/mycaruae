@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">My Car UAE</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_dashboard">Dashboard</string>
+    <string name="nav_maintenance">Maintenance</string>
+    <string name="nav_reminders">Reminders</string>
+    <string name="nav_profile">Profile</string>
+
+    <!-- Splash -->
+    <string name="splash_title">My Car UAE</string>
+    <string name="splash_subtitle">Your vehicle companion</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_back">Back</string>
+    <string name="onboarding_get_started">Get Started</string>
+    <string name="onboarding_title_1">Track Your Vehicle</string>
+    <string name="onboarding_desc_1">Keep all your vehicle information in one place. Mileage, maintenance history, and costs at a glance.</string>
+    <string name="onboarding_title_2">Never Miss a Deadline</string>
+    <string name="onboarding_desc_2">Get timely reminders for registration renewal, vehicle inspection, and scheduled maintenance.</string>
+    <string name="onboarding_title_3">UAE Focused</string>
+    <string name="onboarding_desc_3">Built for all 7 emirates with direct links to RTA and traffic authority portals for quick renewal.</string>
+
+    <!-- Auth -->
+    <string name="auth_register">Register</string>
+    <string name="auth_login">Login</string>
+    <string name="auth_email">Email</string>
+    <string name="auth_password">Password</string>
+    <string name="auth_confirm_password">Confirm Password</string>
+    <string name="auth_forgot_password">Forgot Password?</string>
+    <string name="auth_no_account">Don\'t have an account?</string>
+    <string name="auth_have_account">Already have an account?</string>
+    <string name="auth_sign_up">Sign Up</string>
+    <string name="auth_sign_in">Sign In</string>
+    <string name="auth_reset_password">Reset Password</string>
+
+    <!-- Vehicle -->
+    <string name="vehicle_add_title">Add Your Vehicle</string>
+    <string name="vehicle_brand">Brand</string>
+    <string name="vehicle_model">Model</string>
+    <string name="vehicle_year">Year</string>
+    <string name="vehicle_emirate">Emirate</string>
+    <string name="vehicle_registration_expiry">Registration Expiry</string>
+    <string name="vehicle_inspection_expiry">Inspection Expiry</string>
+    <string name="vehicle_plate">Plate Number</string>
+    <string name="vehicle_color">Color</string>
+    <string name="vehicle_mileage">Current Mileage (km)</string>
+
+    <!-- Dashboard -->
+    <string name="dashboard_title">Dashboard</string>
+    <string name="dashboard_health_good">Good</string>
+    <string name="dashboard_health_fair">Fair</string>
+    <string name="dashboard_health_poor">Needs Attention</string>
+
+    <!-- Status -->
+    <string name="status_registration">Registration</string>
+    <string name="status_inspection">Inspection</string>
+    <string name="status_expired">EXPIRED</string>
+    <string name="status_days_remaining">%1$d days remaining</string>
+    <string name="status_expires_today">Expires TODAY</string>
+    <string name="status_expires_tomorrow">Expires tomorrow</string>
+    <string name="status_expired_days">Expired %1$d days ago</string>
+
+    <!-- Common -->
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
+    <string name="retry">Retry</string>
+    <string name="loading">Loading…</string>
+    <string name="error_generic">Something went wrong. Please try again.</string>
+    <string name="currency_aed">AED</string>
+
+    <!-- Emirates -->
+    <string name="emirate_dubai">Dubai</string>
+    <string name="emirate_abu_dhabi">Abu Dhabi</string>
+    <string name="emirate_sharjah">Sharjah</string>
+    <string name="emirate_ajman">Ajman</string>
+    <string name="emirate_umm_al_quwain">Umm Al Quwain</string>
+    <string name="emirate_ras_al_khaimah">Ras Al Khaimah</string>
+    <string name="emirate_fujairah">Fujairah</string>
+</resources>
