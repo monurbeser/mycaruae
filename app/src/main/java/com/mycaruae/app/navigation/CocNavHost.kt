@@ -22,6 +22,7 @@ import com.mycaruae.app.feature.reminders.RemindersScreen
 import com.mycaruae.app.feature.settings.SettingsScreen
 import com.mycaruae.app.feature.splash.SplashScreen
 import com.mycaruae.app.feature.vehicle.VehicleAddScreen
+import com.mycaruae.app.feature.vehicle.VehicleEditScreen
 
 @Composable
 fun CocNavHost(
@@ -94,6 +95,16 @@ fun CocNavHost(
                 },
             )
         }
+        composable(Screen.VehicleEdit.route) {
+            VehicleEditScreen(
+                onNavigateBack = { navController.popBackStack() },
+                onVehicleDeleted = {
+                    navController.navigate(Screen.VehicleAdd.route) {
+                        popUpTo(Screen.Dashboard.route) { inclusive = true }
+                    }
+                },
+            )
+        }
 
         // --- Main screens (bottom nav) ---
         composable(Screen.Dashboard.route) {
@@ -101,6 +112,15 @@ fun CocNavHost(
                 onNavigateToMileageEntry = { navController.navigate(Screen.MileageEntry.route) },
                 onNavigateToMaintenanceAdd = { navController.navigate(Screen.MaintenanceAdd.route) },
                 onNavigateToReminderCreate = { navController.navigate(Screen.ReminderCreate.route) },
+                onNavigateToVehicleAdd = {
+                    navController.navigate(Screen.VehicleAdd.route)
+                },
+                onNavigateToMileageHistory = {
+                    navController.navigate(Screen.MileageHistory.route)
+                },
+                onNavigateToVehicleEdit = {
+                    navController.navigate(Screen.VehicleEdit.route)
+                },
             )
         }
         composable(Screen.MaintenanceHistory.route) {

@@ -5,6 +5,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Close
@@ -33,6 +34,7 @@ object CocIcons {
     val Edit = Icons.Default.Edit
     val Delete = Icons.Default.Delete
     val Close = Icons.Default.Close
+    val Check = Icons.Default.Check
     val Car = Icons.Default.DirectionsCar
     val Mileage = Icons.Default.Speed
     val Fuel = Icons.Default.LocalGasStation

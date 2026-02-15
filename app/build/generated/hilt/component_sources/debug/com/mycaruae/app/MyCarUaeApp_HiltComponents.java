@@ -1,10 +1,21 @@
 package com.mycaruae.app;
 
+import androidx.hilt.work.HiltWrapper_WorkerFactoryModule;
 import com.mycaruae.app.di.DataStoreModule;
 import com.mycaruae.app.di.DatabaseModule;
 import com.mycaruae.app.feature.auth.AuthViewModel_HiltModules;
+import com.mycaruae.app.feature.dashboard.DashboardViewModel_HiltModules;
+import com.mycaruae.app.feature.maintenance.MaintenanceAddViewModel_HiltModules;
+import com.mycaruae.app.feature.maintenance.MaintenanceDetailViewModel_HiltModules;
+import com.mycaruae.app.feature.maintenance.MaintenanceHistoryViewModel_HiltModules;
+import com.mycaruae.app.feature.mileage.MileageEntryViewModel_HiltModules;
+import com.mycaruae.app.feature.mileage.MileageHistoryViewModel_HiltModules;
+import com.mycaruae.app.feature.reminders.ReminderCreateViewModel_HiltModules;
+import com.mycaruae.app.feature.reminders.RemindersViewModel_HiltModules;
 import com.mycaruae.app.feature.splash.SplashViewModel_HiltModules;
 import com.mycaruae.app.feature.vehicle.VehicleAddViewModel_HiltModules;
+import com.mycaruae.app.feature.vehicle.VehicleEditViewModel_HiltModules;
+import com.mycaruae.app.notification.ReminderWorker_HiltModule;
 import dagger.Binds;
 import dagger.Component;
 import dagger.Module;
@@ -133,8 +144,10 @@ public final class MyCarUaeApp_HiltComponents {
           DataStoreModule.class,
           DatabaseModule.class,
           HiltWrapper_FragmentGetContextFix_FragmentGetContextFixModule.class,
+          HiltWrapper_WorkerFactoryModule.class,
           ActivityRetainedCBuilderModule.class,
-          ServiceCBuilderModule.class
+          ServiceCBuilderModule.class,
+          ReminderWorker_HiltModule.class
       }
   )
   @Singleton
@@ -158,12 +171,21 @@ public final class MyCarUaeApp_HiltComponents {
   @Subcomponent(
       modules = {
           AuthViewModel_HiltModules.KeyModule.class,
+          DashboardViewModel_HiltModules.KeyModule.class,
           HiltWrapper_ActivityRetainedComponentManager_LifecycleModule.class,
           HiltWrapper_SavedStateHandleModule.class,
+          MaintenanceAddViewModel_HiltModules.KeyModule.class,
+          MaintenanceDetailViewModel_HiltModules.KeyModule.class,
+          MaintenanceHistoryViewModel_HiltModules.KeyModule.class,
+          MileageEntryViewModel_HiltModules.KeyModule.class,
+          MileageHistoryViewModel_HiltModules.KeyModule.class,
           ActivityCBuilderModule.class,
           ViewModelCBuilderModule.class,
+          ReminderCreateViewModel_HiltModules.KeyModule.class,
+          RemindersViewModel_HiltModules.KeyModule.class,
           SplashViewModel_HiltModules.KeyModule.class,
-          VehicleAddViewModel_HiltModules.KeyModule.class
+          VehicleAddViewModel_HiltModules.KeyModule.class,
+          VehicleEditViewModel_HiltModules.KeyModule.class
       }
   )
   @ActivityRetainedScoped
@@ -200,9 +222,18 @@ public final class MyCarUaeApp_HiltComponents {
   @Subcomponent(
       modules = {
           AuthViewModel_HiltModules.BindsModule.class,
+          DashboardViewModel_HiltModules.BindsModule.class,
           HiltWrapper_HiltViewModelFactory_ViewModelModule.class,
+          MaintenanceAddViewModel_HiltModules.BindsModule.class,
+          MaintenanceDetailViewModel_HiltModules.BindsModule.class,
+          MaintenanceHistoryViewModel_HiltModules.BindsModule.class,
+          MileageEntryViewModel_HiltModules.BindsModule.class,
+          MileageHistoryViewModel_HiltModules.BindsModule.class,
+          ReminderCreateViewModel_HiltModules.BindsModule.class,
+          RemindersViewModel_HiltModules.BindsModule.class,
           SplashViewModel_HiltModules.BindsModule.class,
-          VehicleAddViewModel_HiltModules.BindsModule.class
+          VehicleAddViewModel_HiltModules.BindsModule.class,
+          VehicleEditViewModel_HiltModules.BindsModule.class
       }
   )
   @ViewModelScoped

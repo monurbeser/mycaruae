@@ -1,90 +1,90 @@
 [
     {
-        "merged": "com.mycaruae.app-debug-67:/mipmap-hdpi_ic_launcher.webp.flat",
-        "source": "com.mycaruae.app-main-69:/mipmap-hdpi/ic_launcher.webp"
+        "merged": "com.mycaruae.app-debug-71:/mipmap-xxxhdpi_ic_launcher_foreground.webp.flat",
+        "source": "com.mycaruae.app-main-73:/mipmap-xxxhdpi/ic_launcher_foreground.webp"
     },
     {
-        "merged": "com.mycaruae.app-debug-67:/font_poppins_semibold.ttf.flat",
-        "source": "com.mycaruae.app-main-69:/font/poppins_semibold.ttf"
+        "merged": "com.mycaruae.app-debug-71:/drawable_ic_launcher_background.xml.flat",
+        "source": "com.mycaruae.app-main-73:/drawable/ic_launcher_background.xml"
     },
     {
-        "merged": "com.mycaruae.app-debug-67:/mipmap-xxxhdpi_ic_launcher_foreground.webp.flat",
-        "source": "com.mycaruae.app-main-69:/mipmap-xxxhdpi/ic_launcher_foreground.webp"
+        "merged": "com.mycaruae.app-debug-71:/mipmap-mdpi_ic_launcher.webp.flat",
+        "source": "com.mycaruae.app-main-73:/mipmap-mdpi/ic_launcher.webp"
     },
     {
-        "merged": "com.mycaruae.app-debug-67:/font_poppins_bold.ttf.flat",
-        "source": "com.mycaruae.app-main-69:/font/poppins_bold.ttf"
+        "merged": "com.mycaruae.app-debug-71:/font_poppins_medium.ttf.flat",
+        "source": "com.mycaruae.app-main-73:/font/poppins_medium.ttf"
     },
     {
-        "merged": "com.mycaruae.app-debug-67:/mipmap-mdpi_ic_launcher_round.webp.flat",
-        "source": "com.mycaruae.app-main-69:/mipmap-mdpi/ic_launcher_round.webp"
+        "merged": "com.mycaruae.app-debug-71:/font_poppins_regular.ttf.flat",
+        "source": "com.mycaruae.app-main-73:/font/poppins_regular.ttf"
     },
     {
-        "merged": "com.mycaruae.app-debug-67:/mipmap-xhdpi_ic_launcher_round.webp.flat",
-        "source": "com.mycaruae.app-main-69:/mipmap-xhdpi/ic_launcher_round.webp"
+        "merged": "com.mycaruae.app-debug-71:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "com.mycaruae.app-main-73:/mipmap-anydpi-v26/ic_launcher_round.xml"
     },
     {
-        "merged": "com.mycaruae.app-debug-67:/mipmap-hdpi_ic_launcher_round.webp.flat",
-        "source": "com.mycaruae.app-main-69:/mipmap-hdpi/ic_launcher_round.webp"
+        "merged": "com.mycaruae.app-debug-71:/mipmap-xhdpi_ic_launcher_round.webp.flat",
+        "source": "com.mycaruae.app-main-73:/mipmap-xhdpi/ic_launcher_round.webp"
     },
     {
-        "merged": "com.mycaruae.app-debug-67:/mipmap-xhdpi_ic_launcher_foreground.webp.flat",
-        "source": "com.mycaruae.app-main-69:/mipmap-xhdpi/ic_launcher_foreground.webp"
+        "merged": "com.mycaruae.app-debug-71:/mipmap-mdpi_ic_launcher_foreground.webp.flat",
+        "source": "com.mycaruae.app-main-73:/mipmap-mdpi/ic_launcher_foreground.webp"
     },
     {
-        "merged": "com.mycaruae.app-debug-67:/mipmap-xxhdpi_ic_launcher_foreground.webp.flat",
-        "source": "com.mycaruae.app-main-69:/mipmap-xxhdpi/ic_launcher_foreground.webp"
+        "merged": "com.mycaruae.app-debug-71:/mipmap-hdpi_ic_launcher_round.webp.flat",
+        "source": "com.mycaruae.app-main-73:/mipmap-hdpi/ic_launcher_round.webp"
     },
     {
-        "merged": "com.mycaruae.app-debug-67:/drawable_ic_launcher_background.xml.flat",
-        "source": "com.mycaruae.app-main-69:/drawable/ic_launcher_background.xml"
+        "merged": "com.mycaruae.app-debug-71:/font_poppins_semibold.ttf.flat",
+        "source": "com.mycaruae.app-main-73:/font/poppins_semibold.ttf"
     },
     {
-        "merged": "com.mycaruae.app-debug-67:/mipmap-xxhdpi_ic_launcher.webp.flat",
-        "source": "com.mycaruae.app-main-69:/mipmap-xxhdpi/ic_launcher.webp"
+        "merged": "com.mycaruae.app-debug-71:/mipmap-xhdpi_ic_launcher_foreground.webp.flat",
+        "source": "com.mycaruae.app-main-73:/mipmap-xhdpi/ic_launcher_foreground.webp"
     },
     {
-        "merged": "com.mycaruae.app-debug-67:/mipmap-mdpi_ic_launcher_foreground.webp.flat",
-        "source": "com.mycaruae.app-main-69:/mipmap-mdpi/ic_launcher_foreground.webp"
+        "merged": "com.mycaruae.app-debug-71:/mipmap-xxxhdpi_ic_launcher.webp.flat",
+        "source": "com.mycaruae.app-main-73:/mipmap-xxxhdpi/ic_launcher.webp"
     },
     {
-        "merged": "com.mycaruae.app-debug-67:/mipmap-xxhdpi_ic_launcher_round.webp.flat",
-        "source": "com.mycaruae.app-main-69:/mipmap-xxhdpi/ic_launcher_round.webp"
+        "merged": "com.mycaruae.app-debug-71:/mipmap-xxhdpi_ic_launcher_foreground.webp.flat",
+        "source": "com.mycaruae.app-main-73:/mipmap-xxhdpi/ic_launcher_foreground.webp"
     },
     {
-        "merged": "com.mycaruae.app-debug-67:/mipmap-xxxhdpi_ic_launcher.webp.flat",
-        "source": "com.mycaruae.app-main-69:/mipmap-xxxhdpi/ic_launcher.webp"
+        "merged": "com.mycaruae.app-debug-71:/mipmap-hdpi_ic_launcher_foreground.webp.flat",
+        "source": "com.mycaruae.app-main-73:/mipmap-hdpi/ic_launcher_foreground.webp"
     },
     {
-        "merged": "com.mycaruae.app-debug-67:/mipmap-mdpi_ic_launcher.webp.flat",
-        "source": "com.mycaruae.app-main-69:/mipmap-mdpi/ic_launcher.webp"
+        "merged": "com.mycaruae.app-debug-71:/mipmap-xxxhdpi_ic_launcher_round.webp.flat",
+        "source": "com.mycaruae.app-main-73:/mipmap-xxxhdpi/ic_launcher_round.webp"
     },
     {
-        "merged": "com.mycaruae.app-debug-67:/mipmap-xxxhdpi_ic_launcher_round.webp.flat",
-        "source": "com.mycaruae.app-main-69:/mipmap-xxxhdpi/ic_launcher_round.webp"
+        "merged": "com.mycaruae.app-debug-71:/mipmap-mdpi_ic_launcher_round.webp.flat",
+        "source": "com.mycaruae.app-main-73:/mipmap-mdpi/ic_launcher_round.webp"
     },
     {
-        "merged": "com.mycaruae.app-debug-67:/font_poppins_medium.ttf.flat",
-        "source": "com.mycaruae.app-main-69:/font/poppins_medium.ttf"
+        "merged": "com.mycaruae.app-debug-71:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.mycaruae.app-main-73:/mipmap-anydpi-v26/ic_launcher.xml"
     },
     {
-        "merged": "com.mycaruae.app-debug-67:/mipmap-xhdpi_ic_launcher.webp.flat",
-        "source": "com.mycaruae.app-main-69:/mipmap-xhdpi/ic_launcher.webp"
+        "merged": "com.mycaruae.app-debug-71:/mipmap-xxhdpi_ic_launcher_round.webp.flat",
+        "source": "com.mycaruae.app-main-73:/mipmap-xxhdpi/ic_launcher_round.webp"
     },
     {
-        "merged": "com.mycaruae.app-debug-67:/mipmap-hdpi_ic_launcher_foreground.webp.flat",
-        "source": "com.mycaruae.app-main-69:/mipmap-hdpi/ic_launcher_foreground.webp"
+        "merged": "com.mycaruae.app-debug-71:/mipmap-hdpi_ic_launcher.webp.flat",
+        "source": "com.mycaruae.app-main-73:/mipmap-hdpi/ic_launcher.webp"
     },
     {
-        "merged": "com.mycaruae.app-debug-67:/mipmap-anydpi-v26_ic_launcher.xml.flat",
-        "source": "com.mycaruae.app-main-69:/mipmap-anydpi-v26/ic_launcher.xml"
+        "merged": "com.mycaruae.app-debug-71:/mipmap-xhdpi_ic_launcher.webp.flat",
+        "source": "com.mycaruae.app-main-73:/mipmap-xhdpi/ic_launcher.webp"
     },
     {
-        "merged": "com.mycaruae.app-debug-67:/font_poppins_regular.ttf.flat",
-        "source": "com.mycaruae.app-main-69:/font/poppins_regular.ttf"
+        "merged": "com.mycaruae.app-debug-71:/font_poppins_bold.ttf.flat",
+        "source": "com.mycaruae.app-main-73:/font/poppins_bold.ttf"
     },
     {
-        "merged": "com.mycaruae.app-debug-67:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
-        "source": "com.mycaruae.app-main-69:/mipmap-anydpi-v26/ic_launcher_round.xml"
+        "merged": "com.mycaruae.app-debug-71:/mipmap-xxhdpi_ic_launcher.webp.flat",
+        "source": "com.mycaruae.app-main-73:/mipmap-xxhdpi/ic_launcher.webp"
     }
 ]
