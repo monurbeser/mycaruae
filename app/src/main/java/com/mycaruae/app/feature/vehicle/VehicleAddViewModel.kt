@@ -24,28 +24,21 @@ import javax.inject.Inject
 
 data class VehicleAddUiState(
     val currentStep: Int = 0,
-    // Step 0: Brand
     val selectedBrandId: String = "",
     val selectedBrandName: String = "",
-    // Step 1: Model (free text for MVP)
     val modelName: String = "",
-    // Step 2: Year
     val year: String = "",
-    // Step 3: Emirate
     val selectedEmirateId: String = "",
     val selectedEmirateName: String = "",
-    // Step 4: Plate Number
     val plateNumber: String = "",
-    // Step 5: Registration & Inspection expiry
     val registrationExpiry: Long = 0L,
     val inspectionExpiry: Long = 0L,
     val registrationExpiryText: String = "",
     val inspectionExpiryText: String = "",
-    // Step 6: Photos + Color + Mileage (optional)
     val photoUris: List<Uri> = emptyList(),
     val color: String = "",
     val currentMileage: String = "",
-    // Validation
+    val vin: String = "",
     val error: String? = null,
     val isLoading: Boolean = false,
     val isSaved: Boolean = false,
@@ -106,7 +99,7 @@ class VehicleAddViewModel @Inject constructor(
                 state.inspectionExpiry == 0L -> "Please set inspection expiry date"
                 else -> null
             }
-            6 -> null // Optional step, no validation
+            6 -> null
             else -> null
         }
     }
@@ -143,11 +136,8 @@ class VehicleAddViewModel @Inject constructor(
 
     fun addPhotoUri(uri: Uri) {
         _uiState.update {
-            if (it.photoUris.size < 5) {
-                it.copy(photoUris = it.photoUris + uri)
-            } else {
-                it.copy(error = "Maximum 5 photos allowed")
-            }
+            if (it.photoUris.size < 5) it.copy(photoUris = it.photoUris + uri)
+            else it.copy(error = "Maximum 5 photos allowed")
         }
     }
 
@@ -163,6 +153,11 @@ class VehicleAddViewModel @Inject constructor(
         if (mileage.all { it.isDigit() }) {
             _uiState.update { it.copy(currentMileage = mileage) }
         }
+    }
+
+    fun onVinChange(vin: String) {
+        val cleaned = vin.uppercase().filter { it.isLetterOrDigit() }.take(17)
+        _uiState.update { it.copy(vin = cleaned) }
     }
 
     fun saveVehicle() {
@@ -188,7 +183,7 @@ class VehicleAddViewModel @Inject constructor(
                 emirate = state.selectedEmirateId,
                 registrationExpiry = state.registrationExpiry,
                 inspectionExpiry = state.inspectionExpiry,
-                vin = null,
+                vin = state.vin.ifBlank { null },
                 plateNumber = state.plateNumber.ifBlank { null },
                 color = state.color.ifBlank { null },
                 currentMileage = state.currentMileage.toIntOrNull() ?: 0,
@@ -200,7 +195,6 @@ class VehicleAddViewModel @Inject constructor(
 
             vehicleRepository.addVehicle(vehicle)
 
-            // Auto-generate reminder chains based on user's notification preferences
             val notificationDays = userData.notificationDays
             reminderRepository.generateExpiryReminders(
                 vehicleId = vehicleId,

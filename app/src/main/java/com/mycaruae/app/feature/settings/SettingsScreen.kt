@@ -13,21 +13,24 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -38,6 +41,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -62,7 +66,8 @@ fun SettingsScreen(
 
     LaunchedEffect(state.isSaved) {
         if (state.isSaved) {
-            snackbarHostState.showSnackbar("Notification preferences saved")
+            snackbarHostState.showSnackbar("Preferences saved")
+            viewModel.resetSaveState()
         }
     }
 
@@ -71,7 +76,7 @@ fun SettingsScreen(
         AlertDialog(
             onDismissRequest = { showLogoutConfirm = false },
             title = { Text(text = "Logout?") },
-            text = { Text(text = "Your data will remain on this device. You can log back in anytime.") },
+            text = { Text(text = "Your data will be cleared from this device.") },
             confirmButton = {
                 TextButton(
                     onClick = {
@@ -110,34 +115,53 @@ fun SettingsScreen(
                 )
                 Spacer(modifier = Modifier.height(12.dp))
 
-                Card(
+                OutlinedTextField(
+                    value = state.userName,
+                    onValueChange = { viewModel.updateName(it) },
+                    label = { Text("Name") },
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    ),
+                    singleLine = true
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                OutlinedTextField(
+                    value = state.userEmail,
+                    onValueChange = { viewModel.updateEmail(it) },
+                    label = { Text("Email") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                )
+
+                Spacer(modifier = Modifier.height(28.dp))
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(28.dp))
+
+                // Theme Section
+                Text(
+                    text = "Theme",
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Column(modifier = Modifier.padding(20.dp)) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                imageVector = CocIcons.Profile,
-                                contentDescription = null,
-                                modifier = Modifier.size(40.dp),
-                                tint = MaterialTheme.colorScheme.primary,
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Column {
-                                Text(
-                                    text = state.userName.ifBlank { "User" },
-                                    style = MaterialTheme.typography.titleSmall,
-                                )
-                                Text(
-                                    text = state.userEmail.ifBlank { "No email" },
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                            }
-                        }
-                    }
+                    ThemeOption(
+                        label = "System",
+                        selected = state.theme == "system",
+                        onClick = { viewModel.setTheme("system") }
+                    )
+                    ThemeOption(
+                        label = "Light",
+                        selected = state.theme == "light",
+                        onClick = { viewModel.setTheme("light") }
+                    )
+                    ThemeOption(
+                        label = "Dark",
+                        selected = state.theme == "dark",
+                        onClick = { viewModel.setTheme("dark") }
+                    )
                 }
 
                 Spacer(modifier = Modifier.height(28.dp))
@@ -145,13 +169,24 @@ fun SettingsScreen(
                 Spacer(modifier = Modifier.height(28.dp))
 
                 // Notification Preferences
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Notifications",
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Switch(
+                        checked = state.notificationsEnabled,
+                        onCheckedChange = { viewModel.setNotificationsEnabled(it) }
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(12.dp))
                 Text(
-                    text = "Notification Preferences",
-                    style = MaterialTheme.typography.titleMedium,
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "Choose when to receive reminders before registration and inspection expiry",
+                    text = "Notify me before expiry:",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -170,6 +205,7 @@ fun SettingsScreen(
                             selected = day in state.notificationDays,
                             onClick = { viewModel.toggleNotificationDay(day) },
                             label = { Text(text = label) },
+                            enabled = state.notificationsEnabled,
                             colors = FilterChipDefaults.filterChipColors(
                                 selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
                             ),
@@ -182,6 +218,7 @@ fun SettingsScreen(
                 Button(
                     onClick = { viewModel.saveNotificationPreferences() },
                     modifier = Modifier.fillMaxWidth().height(48.dp),
+                    enabled = state.notificationsEnabled
                 ) {
                     Text(text = "Save Preferences", style = MaterialTheme.typography.labelLarge)
                 }
@@ -203,7 +240,7 @@ fun SettingsScreen(
                 ) {
                     Text(text = "Version", style = MaterialTheme.typography.bodyMedium)
                     Text(
-                        text = "1.0.0 (MVP)",
+                        text = state.appVersion,
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -228,4 +265,20 @@ fun SettingsScreen(
             }
         }
     }
+}
+
+@Composable
+fun ThemeOption(
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    FilterChip(
+        selected = selected,
+        onClick = onClick,
+        label = { Text(label) },
+        leadingIcon = if (selected) {
+            { Icon(imageVector = Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp)) }
+        } else null
+    )
 }

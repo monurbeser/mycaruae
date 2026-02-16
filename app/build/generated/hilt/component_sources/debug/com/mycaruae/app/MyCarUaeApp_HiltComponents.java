@@ -3,6 +3,7 @@ package com.mycaruae.app;
 import androidx.hilt.work.HiltWrapper_WorkerFactoryModule;
 import com.mycaruae.app.di.DataStoreModule;
 import com.mycaruae.app.di.DatabaseModule;
+import com.mycaruae.app.di.NetworkModule;
 import com.mycaruae.app.feature.auth.AuthViewModel_HiltModules;
 import com.mycaruae.app.feature.dashboard.DashboardViewModel_HiltModules;
 import com.mycaruae.app.feature.maintenance.MaintenanceAddViewModel_HiltModules;
@@ -148,6 +149,7 @@ public final class MyCarUaeApp_HiltComponents {
           HiltWrapper_WorkerFactoryModule.class,
           ActivityRetainedCBuilderModule.class,
           ServiceCBuilderModule.class,
+          NetworkModule.class,
           ReminderWorker_HiltModule.class
       }
   )

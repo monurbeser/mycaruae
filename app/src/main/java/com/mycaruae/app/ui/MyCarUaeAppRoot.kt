@@ -14,8 +14,8 @@ import com.mycaruae.app.navigation.bottomNavScreens
 import com.mycaruae.app.ui.theme.MyCarUaeTheme
 
 @Composable
-fun MyCarUaeAppRoot() {
-    MyCarUaeTheme {
+fun MyCarUaeAppRoot(theme: String) {
+    MyCarUaeTheme(themePreference = theme) {
         val navController = rememberNavController()
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentRoute = navBackStackEntry?.destination?.route

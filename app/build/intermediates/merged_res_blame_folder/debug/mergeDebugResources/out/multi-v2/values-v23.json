@@ -4,7 +4,7 @@
             "outputFile": "com.mycaruae.app-mergeDebugResources-69:/values-v23/values-v23.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\aysep\\.gradle\\caches\\8.9\\transforms\\73e8dade4bac61bff4f9781878488bf1\\transformed\\work-runtime-2.9.1\\res\\values-v23\\values-v23.xml",
+                    "source": "C:\\Users\\aysep\\.gradle\\caches\\8.9\\transforms\\25a87f82da4108b7b02d8f643594a716\\transformed\\work-runtime-2.9.1\\res\\values-v23\\values-v23.xml",
                     "from": {
                         "startLines": "2,3",
                         "startColumns": "4,4",

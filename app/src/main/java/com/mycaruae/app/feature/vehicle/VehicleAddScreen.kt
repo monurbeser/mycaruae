@@ -16,13 +16,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
+import android.content.Intent
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -54,6 +55,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -163,8 +165,10 @@ fun VehicleAddScreen(
                     onRemovePhoto = viewModel::removePhotoUri,
                     color = state.color,
                     mileage = state.currentMileage,
+                    vin = state.vin,
                     onColorChange = viewModel::onColorChange,
                     onMileageChange = viewModel::onMileageChange,
+                    onVinChange = viewModel::onVinChange,
                     modifier = Modifier.weight(1f),
                 )
             }
@@ -419,14 +423,11 @@ private fun DateStep(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Registration expiry
         Text("Registration Expiry", style = MaterialTheme.typography.labelLarge)
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedButton(
             onClick = { showRegPicker = true },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp),
+            modifier = Modifier.fillMaxWidth().height(52.dp),
         ) {
             Icon(CocIcons.Calendar, contentDescription = null, modifier = Modifier.size(20.dp))
             Spacer(modifier = Modifier.width(8.dp))
@@ -435,14 +436,11 @@ private fun DateStep(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Inspection expiry
         Text("Inspection Expiry", style = MaterialTheme.typography.labelLarge)
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedButton(
             onClick = { showInspPicker = true },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp),
+            modifier = Modifier.fillMaxWidth().height(52.dp),
         ) {
             Icon(CocIcons.Calendar, contentDescription = null, modifier = Modifier.size(20.dp))
             Spacer(modifier = Modifier.width(8.dp))
@@ -450,7 +448,6 @@ private fun DateStep(
         }
     }
 
-    // Date Picker Dialogs
     if (showRegPicker) {
         val pickerState = rememberDatePickerState()
         DatePickerDialog(
@@ -466,9 +463,7 @@ private fun DateStep(
             dismissButton = {
                 TextButton(onClick = { showRegPicker = false }) { Text("Cancel") }
             },
-        ) {
-            DatePicker(state = pickerState)
-        }
+        ) { DatePicker(state = pickerState) }
     }
 
     if (showInspPicker) {
@@ -486,9 +481,7 @@ private fun DateStep(
             dismissButton = {
                 TextButton(onClick = { showInspPicker = false }) { Text("Cancel") }
             },
-        ) {
-            DatePicker(state = pickerState)
-        }
+        ) { DatePicker(state = pickerState) }
     }
 }
 
@@ -499,22 +492,25 @@ private fun PhotosAndDetailsStep(
     onRemovePhoto: (Uri) -> Unit,
     color: String,
     mileage: String,
+    vin: String,
     onColorChange: (String) -> Unit,
     onMileageChange: (String) -> Unit,
+    onVinChange: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    // Gallery picker
+    val context = LocalContext.current
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
-    ) { uri -> uri?.let { onAddPhoto(it) } }
-
-    // Camera capture
-    var cameraUri by remember { mutableStateOf<Uri?>(null) }
-    val cameraLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicturePreview(),
-    ) { bitmap ->
-        // TakePicturePreview returns a thumbnail bitmap — for MVP this is fine
-        // Full-size camera capture needs FileProvider setup, will add in later sprint
+    ) { uri ->
+        uri?.let {
+            // Take persistable permission so photo survives app restart
+            try {
+                context.contentResolver.takePersistableUriPermission(
+                    it, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (_: Exception) { /* Some providers don't support persistable */ }
+            onAddPhoto(it)
+        }
     }
 
     Column(
@@ -544,16 +540,12 @@ private fun PhotosAndDetailsStep(
         )
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Photo grid
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(240.dp),
+            modifier = Modifier.fillMaxWidth().height(240.dp),
         ) {
-            // Existing photos
             items(photoUris.size) { index ->
                 Box(
                     modifier = Modifier
@@ -566,17 +558,13 @@ private fun PhotosAndDetailsStep(
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop,
                     )
-                    // Remove button
                     IconButton(
                         onClick = { onRemovePhoto(photoUris[index]) },
                         modifier = Modifier
                             .align(Alignment.TopEnd)
                             .size(28.dp)
                             .padding(2.dp)
-                            .background(
-                                MaterialTheme.colorScheme.errorContainer,
-                                CircleShape,
-                            ),
+                            .background(MaterialTheme.colorScheme.errorContainer, CircleShape),
                     ) {
                         Icon(
                             imageVector = CocIcons.Close,
@@ -588,7 +576,6 @@ private fun PhotosAndDetailsStep(
                 }
             }
 
-            // Add photo button
             if (photoUris.size < 5) {
                 item {
                     Box(
@@ -598,9 +585,7 @@ private fun PhotosAndDetailsStep(
                             .background(MaterialTheme.colorScheme.surfaceVariant)
                             .clickable {
                                 galleryLauncher.launch(
-                                    PickVisualMediaRequest(
-                                        ActivityResultContracts.PickVisualMedia.ImageOnly
-                                    )
+                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                                 )
                             },
                         contentAlignment = Alignment.Center,
@@ -624,6 +609,19 @@ private fun PhotosAndDetailsStep(
         }
 
         Spacer(modifier = Modifier.height(20.dp))
+
+        // VIN (optional)
+        OutlinedTextField(
+            value = vin,
+            onValueChange = onVinChange,
+            label = { Text("VIN (optional)") },
+            placeholder = { Text("17-character Vehicle Identification Number") },
+            modifier = Modifier.fillMaxWidth(),
+            singleLine = true,
+            keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Characters),
+            supportingText = { if (vin.isNotEmpty()) Text("${vin.length}/17") },
+        )
+        Spacer(modifier = Modifier.height(12.dp))
 
         // Color
         OutlinedTextField(

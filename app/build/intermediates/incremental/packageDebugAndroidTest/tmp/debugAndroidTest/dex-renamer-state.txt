@@ -1,4 +1,4 @@
-#Sun Feb 15 20:39:28 TRT 2026
+#Mon Feb 16 20:49:23 TRT 2026
 base.0=D\:\\mycaruae\\app\\build\\intermediates\\dex\\debugAndroidTest\\mergeProjectDexDebugAndroidTest\\0\\classes.dex
 path.0=0/classes.dex
 renamed.0=classes.dex

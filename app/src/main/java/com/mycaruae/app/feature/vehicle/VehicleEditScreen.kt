@@ -1,5 +1,6 @@
 package com.mycaruae.app.feature.vehicle
 
+import android.content.Intent
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -11,7 +12,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -54,13 +54,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
-import com.mycaruae.app.data.database.entity.BrandEntity
-import com.mycaruae.app.data.database.entity.EmirateEntity
 import com.mycaruae.app.ui.components.CocTopBar
 import com.mycaruae.app.ui.components.LoadingScreen
 import com.mycaruae.app.ui.theme.CocIcons
@@ -85,9 +84,19 @@ fun VehicleEditScreen(
     var showBrandPicker by remember { mutableStateOf(false) }
     var showEmiratePicker by remember { mutableStateOf(false) }
 
+    val context = LocalContext.current
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
-    ) { uri -> uri?.let { viewModel.addPhotoUri(it) } }
+    ) { uri ->
+        uri?.let {
+            try {
+                context.contentResolver.takePersistableUriPermission(
+                    it, Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+            } catch (_: Exception) { }
+            viewModel.addPhotoUri(it)
+        }
+    }
 
     LaunchedEffect(state.isSaved) {
         if (state.isSaved) onNavigateBack()
@@ -96,7 +105,6 @@ fun VehicleEditScreen(
         if (state.isDeleted) onVehicleDeleted()
     }
 
-    // Delete confirmation dialog
     if (state.showDeleteConfirm) {
         AlertDialog(
             onDismissRequest = viewModel::hideDeleteConfirm,
@@ -134,7 +142,6 @@ fun VehicleEditScreen(
                     .padding(24.dp)
                     .imePadding(),
             ) {
-                // Error
                 if (state.error != null) {
                     Text(
                         text = state.error!!,
@@ -321,9 +328,7 @@ fun VehicleEditScreen(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
 
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                ) {
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     state.photoUris.forEach { uri ->
                         Box(
                             modifier = Modifier
@@ -376,7 +381,7 @@ fun VehicleEditScreen(
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Save button
+                // Save
                 Button(
                     onClick = viewModel::save,
                     modifier = Modifier.fillMaxWidth().height(52.dp),
@@ -390,7 +395,7 @@ fun VehicleEditScreen(
 
                 Spacer(modifier = Modifier.height(12.dp))
 
-                // Delete button
+                // Delete
                 OutlinedButton(
                     onClick = viewModel::showDeleteConfirm,
                     modifier = Modifier.fillMaxWidth().height(52.dp),

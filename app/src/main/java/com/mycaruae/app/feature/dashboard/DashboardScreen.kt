@@ -1,7 +1,9 @@
 package com.mycaruae.app.feature.dashboard
 
 import android.net.Uri
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,22 +18,34 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
+import com.mycaruae.app.data.database.entity.MileageLogEntity
 import com.mycaruae.app.ui.components.CocTopBar
 import com.mycaruae.app.ui.components.EmptyScreen
 import com.mycaruae.app.ui.components.LoadingScreen
@@ -41,6 +55,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
     onNavigateToMileageEntry: () -> Unit,
@@ -75,15 +90,20 @@ fun DashboardScreen(
                 )
             }
             else -> {
-                DashboardContent(
-                    state = state,
-                    onMileageClick = onNavigateToMileageEntry,
-                    onMileageHistoryClick = onNavigateToMileageHistory,
-                    onMaintenanceClick = onNavigateToMaintenanceAdd,
-                    onReminderClick = onNavigateToReminderCreate,
-                    onEditClick = onNavigateToVehicleEdit,
+                PullToRefreshBox(
+                    isRefreshing = state.isRefreshing,
+                    onRefresh = viewModel::refresh,
                     modifier = Modifier.padding(padding),
-                )
+                ) {
+                    DashboardContent(
+                        state = state,
+                        onMileageClick = onNavigateToMileageEntry,
+                        onMileageHistoryClick = onNavigateToMileageHistory,
+                        onMaintenanceClick = onNavigateToMaintenanceAdd,
+                        onReminderClick = onNavigateToReminderCreate,
+                        onEditClick = onNavigateToVehicleEdit,
+                    )
+                }
             }
         }
     }
@@ -118,7 +138,6 @@ private fun DashboardContent(
             ),
         ) {
             Column(modifier = Modifier.padding(20.dp)) {
-                // Photo if available
                 val firstPhoto = vehicle.photoUris
                     ?.split(",")
                     ?.firstOrNull()
@@ -137,7 +156,6 @@ private fun DashboardContent(
                     Spacer(modifier = Modifier.height(12.dp))
                 }
 
-                // Title row with edit button
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -218,7 +236,6 @@ private fun DashboardContent(
         )
         Spacer(modifier = Modifier.height(12.dp))
 
-        // Registration Status
         StatusCard(
             title = "Registration",
             daysRemaining = state.registrationDaysLeft,
@@ -226,12 +243,28 @@ private fun DashboardContent(
         )
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Inspection Status
         StatusCard(
             title = "Inspection",
             daysRemaining = state.inspectionDaysLeft,
             expiryDateFormatted = dateFormatter.format(Date(vehicle.inspectionExpiry)),
         )
+
+        // Mileage Chart
+        if (state.recentMileage.size >= 2) {
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(
+                text = "Mileage Trend",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onBackground,
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            MileageChart(
+                entries = state.recentMileage,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(180.dp),
+            )
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
@@ -288,5 +321,101 @@ private fun DashboardContent(
         }
 
         Spacer(modifier = Modifier.height(24.dp))
+    }
+}
+
+@Composable
+private fun MileageChart(
+    entries: List<MileageLogEntity>,
+    modifier: Modifier = Modifier,
+) {
+    val sorted = entries.sortedBy { it.recordedDate }
+    val lineColor = MaterialTheme.colorScheme.primary
+    val dotColor = MaterialTheme.colorScheme.primary
+    val gridColor = MaterialTheme.colorScheme.outlineVariant
+    val labelColor = MaterialTheme.colorScheme.onSurfaceVariant
+    val textMeasurer = rememberTextMeasurer()
+    val labelStyle = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp)
+    val dateFormatter = SimpleDateFormat("dd/MM", Locale.ENGLISH)
+
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
+    ) {
+        Canvas(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp),
+        ) {
+            if (sorted.size < 2) return@Canvas
+
+            val values = sorted.map { it.mileage.toFloat() }
+            val minVal = values.min()
+            val maxVal = values.max()
+            val range = if (maxVal - minVal > 0f) maxVal - minVal else 1f
+
+            val leftPadding = 50f
+            val bottomPadding = 30f
+            val chartWidth = size.width - leftPadding
+            val chartHeight = size.height - bottomPadding
+
+            // Grid lines (3 horizontal)
+            for (i in 0..2) {
+                val y = chartHeight * (1f - i / 2f)
+                drawLine(
+                    color = gridColor,
+                    start = Offset(leftPadding, y),
+                    end = Offset(size.width, y),
+                    strokeWidth = 1f,
+                )
+                val labelVal = (minVal + range * i / 2f).toInt()
+                val text = "%,d".format(labelVal)
+                val result = textMeasurer.measure(text, labelStyle)
+                drawText(
+                    textLayoutResult = result,
+                    color = labelColor,
+                    topLeft = Offset(0f, y - result.size.height / 2f),
+                )
+            }
+
+            // Data points & line
+            val path = Path()
+            val points: List<Offset> = values.mapIndexed { index: Int, value: Float ->
+                val x = leftPadding + (index.toFloat() / (values.size - 1)) * chartWidth
+                val y = chartHeight * (1f - (value - minVal) / range)
+                Offset(x, y)
+            }
+
+            points.forEachIndexed { index: Int, point: Offset ->
+                if (index == 0) path.moveTo(point.x, point.y)
+                else path.lineTo(point.x, point.y)
+            }
+
+            drawPath(
+                path = path,
+                color = lineColor,
+                style = Stroke(width = 3f, cap = StrokeCap.Round, join = StrokeJoin.Round),
+            )
+
+            // Dots
+            points.forEach { point: Offset ->
+                drawCircle(color = dotColor, radius = 5f, center = point)
+            }
+
+            // Date labels (first, middle, last)
+            val labelIndices = listOf(0, sorted.size / 2, sorted.size - 1).distinct()
+            labelIndices.forEach { idx: Int ->
+                val x = leftPadding + (idx.toFloat() / (values.size - 1)) * chartWidth
+                val dateText = dateFormatter.format(Date(sorted[idx].recordedDate))
+                val result = textMeasurer.measure(dateText, labelStyle)
+                drawText(
+                    textLayoutResult = result,
+                    color = labelColor,
+                    topLeft = Offset(x - result.size.width / 2f, chartHeight + 8f),
+                )
+            }
+        }
     }
 }

@@ -22,6 +22,7 @@ import hilt_aggregated_deps._com_mycaruae_app_MainActivity_GeneratedInjector;
 import hilt_aggregated_deps._com_mycaruae_app_MyCarUaeApp_GeneratedInjector;
 import hilt_aggregated_deps._com_mycaruae_app_di_DataStoreModule;
 import hilt_aggregated_deps._com_mycaruae_app_di_DatabaseModule;
+import hilt_aggregated_deps._com_mycaruae_app_di_NetworkModule;
 import hilt_aggregated_deps._com_mycaruae_app_feature_auth_AuthViewModel_HiltModules_BindsModule;
 import hilt_aggregated_deps._com_mycaruae_app_feature_auth_AuthViewModel_HiltModules_KeyModule;
 import hilt_aggregated_deps._com_mycaruae_app_feature_dashboard_DashboardViewModel_HiltModules_BindsModule;
@@ -94,6 +95,7 @@ import hilt_aggregated_deps._dagger_hilt_android_internal_modules_HiltWrapper_Ac
         _com_mycaruae_app_MyCarUaeApp_GeneratedInjector.class,
         _com_mycaruae_app_di_DataStoreModule.class,
         _com_mycaruae_app_di_DatabaseModule.class,
+        _com_mycaruae_app_di_NetworkModule.class,
         _com_mycaruae_app_feature_auth_AuthViewModel_HiltModules_BindsModule.class,
         _com_mycaruae_app_feature_auth_AuthViewModel_HiltModules_KeyModule.class,
         _com_mycaruae_app_feature_dashboard_DashboardViewModel_HiltModules_BindsModule.class,
