@@ -17,4 +17,7 @@ interface MileageLogDao {
 
     @Query("SELECT * FROM mileage_logs WHERE vehicleId = :vehicleId ORDER BY mileage DESC LIMIT 1")
     suspend fun getLatest(vehicleId: String): MileageLogEntity?
+
+    @Query("DELETE FROM mileage_logs WHERE id = :id")
+    suspend fun deleteById(id: String)
 }

@@ -20,6 +20,7 @@ data class MaintenanceHistoryUiState(
     val records: List<MaintenanceEntity> = emptyList(),
     val totalCost: Double = 0.0,
     val isLoading: Boolean = true,
+    val pendingDeleteId: String? = null,
 )
 
 @HiltViewModel
@@ -49,6 +50,7 @@ class MaintenanceHistoryViewModel @Inject constructor(
                         records = records,
                         totalCost = totalCost ?: 0.0,
                         isLoading = false,
+                        pendingDeleteId = _uiState.value.pendingDeleteId,
                     )
                 }.collect { state ->
                     _uiState.value = state
@@ -59,9 +61,19 @@ class MaintenanceHistoryViewModel @Inject constructor(
         }
     }
 
-    fun deleteRecord(id: String) {
+    fun requestDelete(id: String) {
+        _uiState.update { it.copy(pendingDeleteId = id) }
+    }
+
+    fun confirmDelete() {
+        val id = _uiState.value.pendingDeleteId ?: return
         viewModelScope.launch {
             maintenanceRepository.deleteRecord(id)
+            _uiState.update { it.copy(pendingDeleteId = null) }
         }
+    }
+
+    fun cancelDelete() {
+        _uiState.update { it.copy(pendingDeleteId = null) }
     }
 }

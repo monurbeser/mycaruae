@@ -18,6 +18,7 @@ import javax.inject.Inject
 data class MileageHistoryUiState(
     val entries: List<MileageLogEntity> = emptyList(),
     val isLoading: Boolean = true,
+    val pendingDeleteId: String? = null,
 )
 
 @HiltViewModel
@@ -48,5 +49,21 @@ class MileageHistoryViewModel @Inject constructor(
                 _uiState.update { it.copy(isLoading = false) }
             }
         }
+    }
+
+    fun requestDelete(id: String) {
+        _uiState.update { it.copy(pendingDeleteId = id) }
+    }
+
+    fun confirmDelete() {
+        val id = _uiState.value.pendingDeleteId ?: return
+        viewModelScope.launch {
+            mileageRepository.deleteEntry(id)
+            _uiState.update { it.copy(pendingDeleteId = null) }
+        }
+    }
+
+    fun cancelDelete() {
+        _uiState.update { it.copy(pendingDeleteId = null) }
     }
 }

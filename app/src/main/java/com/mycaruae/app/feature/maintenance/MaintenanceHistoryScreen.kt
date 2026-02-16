@@ -1,7 +1,10 @@
 package com.mycaruae.app.feature.maintenance
 
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,18 +16,25 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -37,6 +47,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MaintenanceHistoryScreen(
     onNavigateToDetail: (String) -> Unit,
@@ -44,6 +55,25 @@ fun MaintenanceHistoryScreen(
     viewModel: MaintenanceHistoryViewModel = hiltViewModel(),
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    // Delete confirmation dialog
+    if (state.pendingDeleteId != null) {
+        AlertDialog(
+            onDismissRequest = viewModel::cancelDelete,
+            title = { Text("Delete Record?") },
+            text = { Text("Are you sure you want to delete this maintenance record? This cannot be undone.") },
+            confirmButton = {
+                TextButton(onClick = viewModel::confirmDelete) {
+                    Text("Delete", color = MaterialTheme.colorScheme.error)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = viewModel::cancelDelete) {
+                    Text("Cancel")
+                }
+            },
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -82,7 +112,6 @@ fun MaintenanceHistoryScreen(
                         .padding(padding)
                         .padding(horizontal = 24.dp),
                 ) {
-                    // Summary card
                     item {
                         Spacer(modifier = Modifier.height(8.dp))
                         Card(
@@ -127,76 +156,118 @@ fun MaintenanceHistoryScreen(
                         Spacer(modifier = Modifier.height(16.dp))
                     }
 
-                    // Records list
-                    items(state.records, key = { it.id }) { record ->
-                        val typeName = try {
-                            MaintenanceType.valueOf(record.type).displayName
-                        } catch (_: Exception) {
-                            record.type
-                        }
-
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { onNavigateToDetail(record.id) }
-                                .padding(vertical = 12.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Icon(
-                                imageVector = CocIcons.Maintenance,
-                                contentDescription = null,
-                                modifier = Modifier.size(28.dp),
-                                tint = MaterialTheme.colorScheme.primary,
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(
-                                    text = typeName,
-                                    style = MaterialTheme.typography.titleSmall,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                )
-                                Text(
-                                    text = dateFormatter.format(Date(record.serviceDate)),
-                                    style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                )
-                                if (!record.serviceProvider.isNullOrBlank()) {
-                                    Text(
-                                        text = record.serviceProvider,
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
+                    items(
+                        items = state.records,
+                        key = { it.id },
+                    ) { record ->
+                        val dismissState = rememberSwipeToDismissBoxState(
+                            confirmValueChange = { value ->
+                                if (value == SwipeToDismissBoxValue.EndToStart) {
+                                    viewModel.requestDelete(record.id)
+                                    false
+                                } else {
+                                    false
                                 }
-                            }
-                            Column(horizontalAlignment = Alignment.End) {
-                                Text(
-                                    text = "AED %,.2f".format(record.cost),
-                                    style = MaterialTheme.typography.labelLarge,
-                                    color = MaterialTheme.colorScheme.primary,
-                                )
-                                if (record.mileageAtService > 0) {
-                                    Text(
-                                        text = "%,d km".format(record.mileageAtService),
-                                        style = MaterialTheme.typography.bodySmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    )
-                                }
-                            }
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Icon(
-                                imageVector = CocIcons.ChevronRight,
-                                contentDescription = null,
-                                modifier = Modifier.size(20.dp),
-                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
-                            )
-                        }
-
-                        HorizontalDivider(
-                            color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                            },
                         )
+
+                        SwipeToDismissBox(
+                            state = dismissState,
+                            enableDismissFromStartToEnd = false,
+                            backgroundContent = {
+                                val color by animateColorAsState(
+                                    targetValue = if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart)
+                                        MaterialTheme.colorScheme.error else Color.Transparent,
+                                    label = "swipe-bg",
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .background(color)
+                                        .padding(end = 20.dp),
+                                    contentAlignment = Alignment.CenterEnd,
+                                ) {
+                                    Icon(
+                                        imageVector = CocIcons.Delete,
+                                        contentDescription = "Delete",
+                                        tint = Color.White,
+                                    )
+                                }
+                            },
+                        ) {
+                            val typeName = try {
+                                MaintenanceType.valueOf(record.type).displayName
+                            } catch (_: Exception) {
+                                record.type
+                            }
+
+                            Column(
+                                modifier = Modifier.background(MaterialTheme.colorScheme.surface),
+                            ) {
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .clickable { onNavigateToDetail(record.id) }
+                                        .padding(vertical = 12.dp),
+                                    verticalAlignment = Alignment.CenterVertically,
+                                ) {
+                                    Icon(
+                                        imageVector = CocIcons.Maintenance,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(28.dp),
+                                        tint = MaterialTheme.colorScheme.primary,
+                                    )
+                                    Spacer(modifier = Modifier.width(12.dp))
+                                    Column(modifier = Modifier.weight(1f)) {
+                                        Text(
+                                            text = typeName,
+                                            style = MaterialTheme.typography.titleSmall,
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                        )
+                                        Text(
+                                            text = dateFormatter.format(Date(record.serviceDate)),
+                                            style = MaterialTheme.typography.bodySmall,
+                                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        )
+                                        if (!record.serviceProvider.isNullOrBlank()) {
+                                            Text(
+                                                text = record.serviceProvider,
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            )
+                                        }
+                                    }
+                                    Column(horizontalAlignment = Alignment.End) {
+                                        Text(
+                                            text = "AED %,.2f".format(record.cost),
+                                            style = MaterialTheme.typography.labelLarge,
+                                            color = MaterialTheme.colorScheme.primary,
+                                        )
+                                        if (record.mileageAtService > 0) {
+                                            Text(
+                                                text = "%,d km".format(record.mileageAtService),
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                            )
+                                        }
+                                    }
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Icon(
+                                        imageVector = CocIcons.ChevronRight,
+                                        contentDescription = null,
+                                        modifier = Modifier.size(20.dp),
+                                        tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
+                                    )
+                                }
+
+                                HorizontalDivider(
+                                    color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                                )
+                            }
+                        }
                     }
 
-                    item { Spacer(modifier = Modifier.height(80.dp)) } // FAB space
+                    item { Spacer(modifier = Modifier.height(80.dp)) }
                 }
             }
         }

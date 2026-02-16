@@ -32,8 +32,11 @@ class MileageRepository @Inject constructor(
             createdAt = now,
         )
         mileageLogDao.insert(entry)
-        // Also update vehicle's current mileage
         vehicleDao.updateMileage(vehicleId, mileage, now)
         return entry
+    }
+
+    suspend fun deleteEntry(id: String) {
+        mileageLogDao.deleteById(id)
     }
 }
