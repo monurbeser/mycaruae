@@ -23,7 +23,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -81,18 +80,6 @@ fun DashboardScreen(
                 actionIcon = CocIcons.Settings,
             )
         },
-        floatingActionButton = {
-            if (state.hasVehicle) {
-                FloatingActionButton(
-                    onClick = onNavigateToVehicleAdd,
-                    containerColor = MaterialTheme.colorScheme.secondary,
-                    contentColor = MaterialTheme.colorScheme.onSecondary,
-                    shape = CircleShape,
-                ) {
-                    Icon(CocIcons.Add, contentDescription = "Add vehicle")
-                }
-            }
-        },
     ) { padding ->
         when {
             state.isLoading -> {
@@ -121,6 +108,7 @@ fun DashboardScreen(
                         onMaintenanceClick = onNavigateToMaintenanceAdd,
                         onReminderClick = onNavigateToReminderCreate,
                         onEditClick = onNavigateToVehicleEdit,
+                        onAddVehicle = onNavigateToVehicleAdd,
                     )
                 }
             }
@@ -137,6 +125,7 @@ private fun DashboardPager(
     onMaintenanceClick: () -> Unit,
     onReminderClick: () -> Unit,
     onEditClick: () -> Unit,
+    onAddVehicle: () -> Unit,
 ) {
     val pagerState = rememberPagerState(
         initialPage = state.currentPage,
@@ -187,6 +176,7 @@ private fun DashboardPager(
                 onMaintenanceClick = onMaintenanceClick,
                 onReminderClick = onReminderClick,
                 onEditClick = onEditClick,
+                onAddVehicle = onAddVehicle,
             )
         }
     }
@@ -200,6 +190,7 @@ private fun VehiclePage(
     onMaintenanceClick: () -> Unit,
     onReminderClick: () -> Unit,
     onEditClick: () -> Unit,
+    onAddVehicle: () -> Unit,
 ) {
     val vehicle = data.vehicle
     val dateFormatter = SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH)
@@ -258,7 +249,7 @@ private fun VehiclePage(
                     }
                 }
 
-                // Year
+                // Year + Emirate
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = CocIcons.Calendar,
@@ -273,7 +264,6 @@ private fun VehiclePage(
                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
                     )
 
-                    // Emirate
                     Spacer(modifier = Modifier.width(16.dp))
                     Icon(
                         imageVector = CocIcons.Info,
@@ -441,7 +431,19 @@ private fun VehiclePage(
             }
         }
 
-        Spacer(modifier = Modifier.height(80.dp)) // FAB space
+        Spacer(modifier = Modifier.height(8.dp))
+
+        // Add Vehicle
+        OutlinedButton(
+            onClick = onAddVehicle,
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            Icon(CocIcons.Add, contentDescription = null, modifier = Modifier.size(18.dp))
+            Spacer(modifier = Modifier.width(6.dp))
+            Text("Add Vehicle")
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 
@@ -456,7 +458,7 @@ private fun MileageChart(
     val gridColor = MaterialTheme.colorScheme.outlineVariant
     val labelColor = MaterialTheme.colorScheme.onSurfaceVariant
     val textMeasurer = rememberTextMeasurer()
-    val labelStyle = MaterialTheme.typography.labelSmall.copy(fontSize = 10.sp)
+    val labelStyle = MaterialTheme.typography.labelSmall.copy(fontSize = 9.sp)
     val dateFormatter = SimpleDateFormat("dd/MM", Locale.ENGLISH)
 
     Card(
@@ -468,7 +470,7 @@ private fun MileageChart(
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(start = 16.dp, end = 16.dp, top = 24.dp, bottom = 16.dp),
         ) {
             if (sorted.size < 2) return@Canvas
 
@@ -477,17 +479,19 @@ private fun MileageChart(
             val maxVal = values.max()
             val range = if (maxVal - minVal > 0f) maxVal - minVal else 1f
 
-            val leftPadding = 50f
-            val bottomPadding = 30f
-            val chartWidth = size.width - leftPadding
-            val chartHeight = size.height - bottomPadding
+            val leftPadding = 60f
+            val bottomPadding = 36f
+            val topPadding = 8f
+            val chartWidth = size.width - leftPadding - 8f
+            val chartHeight = size.height - bottomPadding - topPadding
 
+            // Grid lines (3 horizontal)
             for (i in 0..2) {
-                val y = chartHeight * (1f - i / 2f)
+                val y = topPadding + chartHeight * (1f - i / 2f)
                 drawLine(
                     color = gridColor,
                     start = Offset(leftPadding, y),
-                    end = Offset(size.width, y),
+                    end = Offset(size.width - 8f, y),
                     strokeWidth = 1f,
                 )
                 val labelVal = (minVal + range * i / 2f).toInt()
@@ -496,14 +500,18 @@ private fun MileageChart(
                 drawText(
                     textLayoutResult = result,
                     color = labelColor,
-                    topLeft = Offset(0f, y - result.size.height / 2f),
+                    topLeft = Offset(
+                        leftPadding - result.size.width - 6f,
+                        y - result.size.height / 2f,
+                    ),
                 )
             }
 
+            // Data points & line
             val path = Path()
             val points: List<Offset> = values.mapIndexed { index: Int, value: Float ->
                 val x = leftPadding + (index.toFloat() / (values.size - 1)) * chartWidth
-                val y = chartHeight * (1f - (value - minVal) / range)
+                val y = topPadding + chartHeight * (1f - (value - minVal) / range)
                 Offset(x, y)
             }
 
@@ -518,11 +526,18 @@ private fun MileageChart(
                 style = Stroke(width = 3f, cap = StrokeCap.Round, join = StrokeJoin.Round),
             )
 
+            // Dots
             points.forEach { point: Offset ->
                 drawCircle(color = dotColor, radius = 5f, center = point)
             }
 
-            val labelIndices = listOf(0, sorted.size / 2, sorted.size - 1).distinct()
+            // Date labels (first and last only to avoid overlap)
+            val labelIndices = if (sorted.size > 2) {
+                listOf(0, sorted.size - 1)
+            } else {
+                listOf(0, sorted.size - 1)
+            }.distinct()
+
             labelIndices.forEach { idx: Int ->
                 val x = leftPadding + (idx.toFloat() / (values.size - 1)) * chartWidth
                 val dateText = dateFormatter.format(Date(sorted[idx].recordedDate))
@@ -530,7 +545,10 @@ private fun MileageChart(
                 drawText(
                     textLayoutResult = result,
                     color = labelColor,
-                    topLeft = Offset(x - result.size.width / 2f, chartHeight + 8f),
+                    topLeft = Offset(
+                        (x - result.size.width / 2f).coerceIn(leftPadding, size.width - result.size.width.toFloat()),
+                        topPadding + chartHeight + 10f,
+                    ),
                 )
             }
         }

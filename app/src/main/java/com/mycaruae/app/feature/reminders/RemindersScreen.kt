@@ -1,6 +1,5 @@
 package com.mycaruae.app.feature.reminders
 
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -12,8 +11,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -33,11 +30,11 @@ import com.mycaruae.app.data.database.entity.ReminderEntity
 import com.mycaruae.app.ui.components.CocTopBar
 import com.mycaruae.app.ui.components.EmptyScreen
 import com.mycaruae.app.ui.components.LoadingScreen
+import com.mycaruae.app.ui.components.StatusCard
 import com.mycaruae.app.ui.theme.CocIcons
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.concurrent.TimeUnit
 
 @Composable
 fun RemindersScreen(
@@ -67,33 +64,56 @@ fun RemindersScreen(
             state.isLoading -> {
                 LoadingScreen(modifier = Modifier.padding(padding))
             }
-            state.pendingReminders.isEmpty() && state.completedReminders.isEmpty() -> {
+            !state.hasVehicle -> {
                 EmptyScreen(
-                    title = "No reminders",
-                    description = "Tap + to create your first reminder for registration, inspection, or maintenance.",
+                    title = "No vehicle",
+                    description = "Add a vehicle first to see reminders.",
                     modifier = Modifier.padding(padding),
                 )
             }
             else -> {
+                val dateFormatter = SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH)
+
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(padding)
                         .padding(horizontal = 24.dp),
                 ) {
-                    // Pending section
-                    if (state.pendingReminders.isNotEmpty()) {
+                    // Vehicle Expiries section
+                    item {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Vehicle Expiries",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.onBackground,
+                        )
+                        Spacer(modifier = Modifier.height(12.dp))
+                    }
+
+                    items(state.expiries, key = { it.type }) { expiry ->
+                        StatusCard(
+                            title = expiry.title,
+                            daysRemaining = expiry.daysRemaining,
+                            expiryDateFormatted = dateFormatter.format(Date(expiry.expiryDate)),
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+
+                    // Manual Reminders section
+                    if (state.manualReminders.isNotEmpty()) {
                         item {
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = "Upcoming",
+                                text = "My Reminders",
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onBackground,
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                         }
-                        items(state.pendingReminders, key = { it.id }) { reminder ->
-                            ReminderItem(
+
+                        items(state.manualReminders, key = { it.id }) { reminder ->
+                            ManualReminderItem(
                                 reminder = reminder,
                                 onComplete = { viewModel.completeReminder(reminder) },
                                 onDismiss = { viewModel.dismissReminder(reminder) },
@@ -109,12 +129,13 @@ fun RemindersScreen(
                         item {
                             Spacer(modifier = Modifier.height(16.dp))
                             Text(
-                                text = "Completed / Dismissed",
+                                text = "Completed",
                                 style = MaterialTheme.typography.titleMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                         }
+
                         items(state.completedReminders, key = { it.id }) { reminder ->
                             CompletedReminderItem(reminder = reminder)
                             HorizontalDivider(
@@ -131,23 +152,12 @@ fun RemindersScreen(
 }
 
 @Composable
-private fun ReminderItem(
+private fun ManualReminderItem(
     reminder: ReminderEntity,
     onComplete: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     val dateFormatter = SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH)
-    val now = System.currentTimeMillis()
-    val daysLeft = if (reminder.dueDate != null) {
-        TimeUnit.MILLISECONDS.toDays(reminder.dueDate - now)
-    } else null
-
-    val severityColor = when (reminder.severity) {
-        "CRITICAL" -> MaterialTheme.colorScheme.error
-        "HIGH" -> MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
-        "MEDIUM" -> MaterialTheme.colorScheme.tertiary
-        else -> MaterialTheme.colorScheme.primary
-    }
 
     Row(
         modifier = Modifier
@@ -159,7 +169,7 @@ private fun ReminderItem(
             imageVector = CocIcons.Reminders,
             contentDescription = null,
             modifier = Modifier.size(28.dp),
-            tint = severityColor,
+            tint = MaterialTheme.colorScheme.primary,
         )
         Spacer(modifier = Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {
@@ -175,19 +185,14 @@ private fun ReminderItem(
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-            if (daysLeft != null) {
+            if (!reminder.note.isNullOrBlank()) {
                 Text(
-                    text = when {
-                        daysLeft < 0 -> "Overdue by ${-daysLeft} days"
-                        daysLeft == 0L -> "Due today"
-                        else -> "$daysLeft days left"
-                    },
-                    style = MaterialTheme.typography.labelSmall,
-                    color = severityColor,
+                    text = reminder.note,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                 )
             }
         }
-        // Complete button
         IconButton(onClick = onComplete) {
             Icon(
                 imageVector = CocIcons.Check,
@@ -195,7 +200,6 @@ private fun ReminderItem(
                 tint = MaterialTheme.colorScheme.primary,
             )
         }
-        // Dismiss button
         IconButton(onClick = onDismiss) {
             Icon(
                 imageVector = CocIcons.Close,
@@ -217,7 +221,7 @@ private fun CompletedReminderItem(reminder: ReminderEntity) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Icon(
-            imageVector = if (reminder.status == "COMPLETED") CocIcons.Check else CocIcons.Close,
+            imageVector = CocIcons.Check,
             contentDescription = null,
             modifier = Modifier.size(24.dp),
             tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
