@@ -13,6 +13,15 @@ interface VehicleDao {
     @Query("SELECT * FROM vehicles WHERE userId = :userId LIMIT 1")
     fun getByUserId(userId: String): Flow<VehicleEntity?>
 
+    @Query("SELECT * FROM vehicles WHERE userId = :userId ORDER BY createdAt DESC")
+    fun getAllByUser(userId: String): Flow<List<VehicleEntity>>
+
+    @Query("SELECT * FROM vehicles WHERE id = :vehicleId")
+    fun getById(vehicleId: String): Flow<VehicleEntity?>
+
+    @Query("SELECT * FROM vehicles WHERE id = :vehicleId")
+    suspend fun getByIdOnce(vehicleId: String): VehicleEntity?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(vehicle: VehicleEntity)
 
@@ -30,4 +39,7 @@ interface VehicleDao {
 
     @Query("UPDATE vehicles SET inspectionExpiry = :expiry, updatedAt = :updatedAt WHERE id = :vehicleId")
     suspend fun updateInspectionExpiry(vehicleId: String, expiry: Long, updatedAt: Long)
+
+    @Query("SELECT COUNT(*) FROM vehicles WHERE userId = :userId")
+    suspend fun getVehicleCount(userId: String): Int
 }

@@ -2,8 +2,8 @@ package com.mycaruae.app.feature.dashboard;
 
 import com.mycaruae.app.data.datastore.UserPreferences;
 import com.mycaruae.app.data.repository.BrandRepository;
+import com.mycaruae.app.data.repository.EmirateRepository;
 import com.mycaruae.app.data.repository.MileageRepository;
-import com.mycaruae.app.data.repository.ReminderRepository;
 import com.mycaruae.app.data.repository.VehicleRepository;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
@@ -31,41 +31,41 @@ public final class DashboardViewModel_Factory implements Factory<DashboardViewMo
 
   private final Provider<BrandRepository> brandRepositoryProvider;
 
-  private final Provider<MileageRepository> mileageRepositoryProvider;
+  private final Provider<EmirateRepository> emirateRepositoryProvider;
 
-  private final Provider<ReminderRepository> reminderRepositoryProvider;
+  private final Provider<MileageRepository> mileageRepositoryProvider;
 
   private final Provider<UserPreferences> userPreferencesProvider;
 
   public DashboardViewModel_Factory(Provider<VehicleRepository> vehicleRepositoryProvider,
       Provider<BrandRepository> brandRepositoryProvider,
+      Provider<EmirateRepository> emirateRepositoryProvider,
       Provider<MileageRepository> mileageRepositoryProvider,
-      Provider<ReminderRepository> reminderRepositoryProvider,
       Provider<UserPreferences> userPreferencesProvider) {
     this.vehicleRepositoryProvider = vehicleRepositoryProvider;
     this.brandRepositoryProvider = brandRepositoryProvider;
+    this.emirateRepositoryProvider = emirateRepositoryProvider;
     this.mileageRepositoryProvider = mileageRepositoryProvider;
-    this.reminderRepositoryProvider = reminderRepositoryProvider;
     this.userPreferencesProvider = userPreferencesProvider;
   }
 
   @Override
   public DashboardViewModel get() {
-    return newInstance(vehicleRepositoryProvider.get(), brandRepositoryProvider.get(), mileageRepositoryProvider.get(), reminderRepositoryProvider.get(), userPreferencesProvider.get());
+    return newInstance(vehicleRepositoryProvider.get(), brandRepositoryProvider.get(), emirateRepositoryProvider.get(), mileageRepositoryProvider.get(), userPreferencesProvider.get());
   }
 
   public static DashboardViewModel_Factory create(
       Provider<VehicleRepository> vehicleRepositoryProvider,
       Provider<BrandRepository> brandRepositoryProvider,
+      Provider<EmirateRepository> emirateRepositoryProvider,
       Provider<MileageRepository> mileageRepositoryProvider,
-      Provider<ReminderRepository> reminderRepositoryProvider,
       Provider<UserPreferences> userPreferencesProvider) {
-    return new DashboardViewModel_Factory(vehicleRepositoryProvider, brandRepositoryProvider, mileageRepositoryProvider, reminderRepositoryProvider, userPreferencesProvider);
+    return new DashboardViewModel_Factory(vehicleRepositoryProvider, brandRepositoryProvider, emirateRepositoryProvider, mileageRepositoryProvider, userPreferencesProvider);
   }
 
   public static DashboardViewModel newInstance(VehicleRepository vehicleRepository,
-      BrandRepository brandRepository, MileageRepository mileageRepository,
-      ReminderRepository reminderRepository, UserPreferences userPreferences) {
-    return new DashboardViewModel(vehicleRepository, brandRepository, mileageRepository, reminderRepository, userPreferences);
+      BrandRepository brandRepository, EmirateRepository emirateRepository,
+      MileageRepository mileageRepository, UserPreferences userPreferences) {
+    return new DashboardViewModel(vehicleRepository, brandRepository, emirateRepository, mileageRepository, userPreferences);
   }
 }

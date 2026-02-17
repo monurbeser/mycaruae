@@ -195,6 +195,9 @@ class VehicleAddViewModel @Inject constructor(
 
             vehicleRepository.addVehicle(vehicle)
 
+            // Set as active vehicle
+            userPreferences.setActiveVehicleId(vehicleId)
+
             val notificationDays = userData.notificationDays
             reminderRepository.generateExpiryReminders(
                 vehicleId = vehicleId,

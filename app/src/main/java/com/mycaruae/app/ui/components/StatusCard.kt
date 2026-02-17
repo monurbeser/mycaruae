@@ -20,15 +20,15 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import com.mycaruae.app.ui.theme.CocIcons
 import com.mycaruae.app.ui.theme.StatusExpired
-import com.mycaruae.app.ui.theme.StatusExpiredContainer
+import com.mycaruae.app.ui.theme.StatusExpiredLight
 import com.mycaruae.app.ui.theme.StatusGreen
-import com.mycaruae.app.ui.theme.StatusGreenContainer
+import com.mycaruae.app.ui.theme.StatusGreenLight
 import com.mycaruae.app.ui.theme.StatusOrange
-import com.mycaruae.app.ui.theme.StatusOrangeContainer
+import com.mycaruae.app.ui.theme.StatusOrangeLight
 import com.mycaruae.app.ui.theme.StatusRed
-import com.mycaruae.app.ui.theme.StatusRedContainer
+import com.mycaruae.app.ui.theme.StatusRedLight
 import com.mycaruae.app.ui.theme.StatusYellow
-import com.mycaruae.app.ui.theme.StatusYellowContainer
+import com.mycaruae.app.ui.theme.StatusYellowLight
 
 enum class ExpiryLevel {
     GREEN, YELLOW, ORANGE, RED, EXPIRED
@@ -43,11 +43,11 @@ fun daysToExpiryLevel(days: Long): ExpiryLevel = when {
 }
 
 fun ExpiryLevel.containerColor(): Color = when (this) {
-    ExpiryLevel.GREEN -> StatusGreenContainer
-    ExpiryLevel.YELLOW -> StatusYellowContainer
-    ExpiryLevel.ORANGE -> StatusOrangeContainer
-    ExpiryLevel.RED -> StatusRedContainer
-    ExpiryLevel.EXPIRED -> StatusExpiredContainer
+    ExpiryLevel.GREEN -> StatusGreenLight
+    ExpiryLevel.YELLOW -> StatusYellowLight
+    ExpiryLevel.ORANGE -> StatusOrangeLight
+    ExpiryLevel.RED -> StatusRedLight
+    ExpiryLevel.EXPIRED -> StatusExpiredLight
 }
 
 fun ExpiryLevel.contentColor(): Color = when (this) {

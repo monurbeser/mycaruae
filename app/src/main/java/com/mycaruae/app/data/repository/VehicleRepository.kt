@@ -15,6 +15,18 @@ class VehicleRepository @Inject constructor(
         return vehicleDao.getByUserId(userId)
     }
 
+    fun getAllVehicles(userId: String): Flow<List<VehicleEntity>> {
+        return vehicleDao.getAllByUser(userId)
+    }
+
+    fun getVehicleById(vehicleId: String): Flow<VehicleEntity?> {
+        return vehicleDao.getById(vehicleId)
+    }
+
+    suspend fun getVehicleByIdOnce(vehicleId: String): VehicleEntity? {
+        return vehicleDao.getByIdOnce(vehicleId)
+    }
+
     suspend fun addVehicle(vehicle: VehicleEntity) {
         vehicleDao.insert(vehicle)
     }
@@ -25,6 +37,10 @@ class VehicleRepository @Inject constructor(
 
     suspend fun deleteVehicle(id: String) {
         vehicleDao.deleteById(id)
+    }
+
+    suspend fun getVehicleCount(userId: String): Int {
+        return vehicleDao.getVehicleCount(userId)
     }
 
     fun generateId(): String = UUID.randomUUID().toString()

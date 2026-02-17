@@ -1,3 +1,5 @@
+@file:OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+
 package com.mycaruae.app.feature.dashboard
 
 import androidx.lifecycle.ViewModel
@@ -6,30 +8,32 @@ import com.mycaruae.app.data.database.entity.MileageLogEntity
 import com.mycaruae.app.data.database.entity.VehicleEntity
 import com.mycaruae.app.data.datastore.UserPreferences
 import com.mycaruae.app.data.repository.BrandRepository
+import com.mycaruae.app.data.repository.EmirateRepository
 import com.mycaruae.app.data.repository.MileageRepository
-import com.mycaruae.app.data.repository.ReminderRepository
 import com.mycaruae.app.data.repository.VehicleRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
+data class VehicleDashData(
+    val vehicle: VehicleEntity,
+    val brandName: String,
+    val emirateName: String,
+    val registrationDaysLeft: Long,
+    val inspectionDaysLeft: Long,
+    val recentMileage: List<MileageLogEntity>,
+)
+
 data class DashboardUiState(
     val userName: String = "",
-    val vehicle: VehicleEntity? = null,
-    val brandName: String = "",
-    val registrationDaysLeft: Long = 0,
-    val inspectionDaysLeft: Long = 0,
-    val recentMileage: List<MileageLogEntity> = emptyList(),
-    val pendingReminders: Int = 0,
+    val vehiclePages: List<VehicleDashData> = emptyList(),
+    val currentPage: Int = 0,
     val isLoading: Boolean = true,
     val hasVehicle: Boolean = false,
     val isRefreshing: Boolean = false,
@@ -39,8 +43,8 @@ data class DashboardUiState(
 class DashboardViewModel @Inject constructor(
     private val vehicleRepository: VehicleRepository,
     private val brandRepository: BrandRepository,
+    private val emirateRepository: EmirateRepository,
     private val mileageRepository: MileageRepository,
-    private val reminderRepository: ReminderRepository,
     private val userPreferences: UserPreferences,
 ) : ViewModel() {
 
@@ -57,53 +61,66 @@ class DashboardViewModel @Inject constructor(
             _uiState.update { it.copy(userName = userData.name) }
 
             val brands = brandRepository.getAllBrands().first()
+            val emirates = emirateRepository.getAllEmirates().first()
 
-            vehicleRepository.getVehicle(userData.userId).flatMapLatest { vehicle ->
-                if (vehicle != null) {
-                    combine(
-                        mileageRepository.getHistory(vehicle.id),
-                        reminderRepository.getUpcoming(vehicle.id, 50),
-                    ) { mileageList, reminders ->
-                        Triple(vehicle, mileageList, reminders)
-                    }
-                } else {
-                    flowOf(Triple(null, emptyList(), emptyList()))
-                }
-            }.collect { (vehicle, mileageList, reminders) ->
-                if (vehicle != null) {
-                    val brand = brands.find { it.id == vehicle.brandId }
-                    val now = System.currentTimeMillis()
-                    val regDays = TimeUnit.MILLISECONDS.toDays(vehicle.registrationExpiry - now)
-                    val inspDays = TimeUnit.MILLISECONDS.toDays(vehicle.inspectionExpiry - now)
-
+            vehicleRepository.getAllVehicles(userData.userId).collect { vehicles ->
+                if (vehicles.isEmpty()) {
                     _uiState.update {
                         it.copy(
-                            vehicle = vehicle,
-                            brandName = brand?.name ?: "",
-                            registrationDaysLeft = regDays,
-                            inspectionDaysLeft = inspDays,
-                            recentMileage = mileageList.take(10),
-                            pendingReminders = reminders.size,
+                            vehiclePages = emptyList(),
                             isLoading = false,
                             isRefreshing = false,
-                            hasVehicle = true,
+                            hasVehicle = false,
                         )
                     }
-                } else {
-                    _uiState.update {
-                        it.copy(isLoading = false, isRefreshing = false, hasVehicle = false)
-                    }
+                    return@collect
                 }
+
+                val now = System.currentTimeMillis()
+                val pages = vehicles.map { vehicle ->
+                    val brand = brands.find { it.id == vehicle.brandId }
+                    val emirate = emirates.find { it.id == vehicle.emirate }
+                    val mileage = mileageRepository.getHistory(vehicle.id).first()
+
+                    VehicleDashData(
+                        vehicle = vehicle,
+                        brandName = brand?.name ?: vehicle.brandId,
+                        emirateName = emirate?.nameEn ?: vehicle.emirate,
+                        registrationDaysLeft = TimeUnit.MILLISECONDS.toDays(vehicle.registrationExpiry - now),
+                        inspectionDaysLeft = TimeUnit.MILLISECONDS.toDays(vehicle.inspectionExpiry - now),
+                        recentMileage = mileage.take(10),
+                    )
+                }
+
+                // Find active vehicle page index
+                val activeId = userPreferences.userData.first().activeVehicleId
+                val activeIndex = vehicles.indexOfFirst { it.id == activeId }.coerceAtLeast(0)
+
+                _uiState.update {
+                    it.copy(
+                        vehiclePages = pages,
+                        currentPage = activeIndex,
+                        isLoading = false,
+                        isRefreshing = false,
+                        hasVehicle = true,
+                    )
+                }
+            }
+        }
+    }
+
+    fun onPageChanged(page: Int) {
+        val pages = _uiState.value.vehiclePages
+        if (page in pages.indices) {
+            _uiState.update { it.copy(currentPage = page) }
+            viewModelScope.launch {
+                userPreferences.setActiveVehicleId(pages[page].vehicle.id)
             }
         }
     }
 
     fun refresh() {
         _uiState.update { it.copy(isRefreshing = true) }
-        // Flow zaten reactive, sadece flag reset
-        viewModelScope.launch {
-            kotlinx.coroutines.delay(500) // Minimum visual feedback
-            _uiState.update { it.copy(isRefreshing = false) }
-        }
+        loadDashboard()
     }
 }

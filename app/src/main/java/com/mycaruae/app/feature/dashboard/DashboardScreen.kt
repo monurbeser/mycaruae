@@ -2,6 +2,7 @@ package com.mycaruae.app.feature.dashboard
 
 import android.net.Uri
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,12 +14,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -27,12 +32,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
@@ -75,6 +81,18 @@ fun DashboardScreen(
                 actionIcon = CocIcons.Settings,
             )
         },
+        floatingActionButton = {
+            if (state.hasVehicle) {
+                FloatingActionButton(
+                    onClick = onNavigateToVehicleAdd,
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.onSecondary,
+                    shape = CircleShape,
+                ) {
+                    Icon(CocIcons.Add, contentDescription = "Add vehicle")
+                }
+            }
+        },
     ) { padding ->
         when {
             state.isLoading -> {
@@ -95,8 +113,9 @@ fun DashboardScreen(
                     onRefresh = viewModel::refresh,
                     modifier = Modifier.padding(padding),
                 ) {
-                    DashboardContent(
+                    DashboardPager(
                         state = state,
+                        onPageChanged = viewModel::onPageChanged,
                         onMileageClick = onNavigateToMileageEntry,
                         onMileageHistoryClick = onNavigateToMileageHistory,
                         onMaintenanceClick = onNavigateToMaintenanceAdd,
@@ -110,20 +129,83 @@ fun DashboardScreen(
 }
 
 @Composable
-private fun DashboardContent(
+private fun DashboardPager(
     state: DashboardUiState,
+    onPageChanged: (Int) -> Unit,
     onMileageClick: () -> Unit,
     onMileageHistoryClick: () -> Unit,
     onMaintenanceClick: () -> Unit,
     onReminderClick: () -> Unit,
     onEditClick: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
-    val vehicle = state.vehicle ?: return
+    val pagerState = rememberPagerState(
+        initialPage = state.currentPage,
+        pageCount = { state.vehiclePages.size },
+    )
+
+    LaunchedEffect(pagerState) {
+        snapshotFlow { pagerState.settledPage }.collect { page ->
+            onPageChanged(page)
+        }
+    }
+
+    Column(modifier = Modifier.fillMaxSize()) {
+        // Page indicator dots
+        if (state.vehiclePages.size > 1) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 8.dp),
+                horizontalArrangement = Arrangement.Center,
+            ) {
+                state.vehiclePages.forEachIndexed { index, _ ->
+                    Box(
+                        modifier = Modifier
+                            .padding(horizontal = 4.dp)
+                            .size(if (index == pagerState.currentPage) 10.dp else 6.dp)
+                            .clip(CircleShape)
+                            .background(
+                                if (index == pagerState.currentPage)
+                                    MaterialTheme.colorScheme.primary
+                                else
+                                    MaterialTheme.colorScheme.outlineVariant
+                            ),
+                    )
+                }
+            }
+        }
+
+        HorizontalPager(
+            state = pagerState,
+            modifier = Modifier.fillMaxSize(),
+        ) { page ->
+            val data = state.vehiclePages[page]
+            VehiclePage(
+                data = data,
+                onMileageClick = onMileageClick,
+                onMileageHistoryClick = onMileageHistoryClick,
+                onMaintenanceClick = onMaintenanceClick,
+                onReminderClick = onReminderClick,
+                onEditClick = onEditClick,
+            )
+        }
+    }
+}
+
+@Composable
+private fun VehiclePage(
+    data: VehicleDashData,
+    onMileageClick: () -> Unit,
+    onMileageHistoryClick: () -> Unit,
+    onMaintenanceClick: () -> Unit,
+    onReminderClick: () -> Unit,
+    onEditClick: () -> Unit,
+) {
+    val vehicle = data.vehicle
     val dateFormatter = SimpleDateFormat("dd MMM yyyy", Locale.ENGLISH)
 
     Column(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 24.dp),
@@ -156,12 +238,13 @@ private fun DashboardContent(
                     Spacer(modifier = Modifier.height(12.dp))
                 }
 
+                // Title + edit
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = "${state.brandName} ${vehicle.modelId}",
+                        text = "${data.brandName} ${vehicle.modelId}",
                         style = MaterialTheme.typography.headlineMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.weight(1f),
@@ -175,6 +258,7 @@ private fun DashboardContent(
                     }
                 }
 
+                // Year
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = CocIcons.Calendar,
@@ -189,8 +273,26 @@ private fun DashboardContent(
                         color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
                     )
 
-                    if (!vehicle.plateNumber.isNullOrBlank()) {
-                        Spacer(modifier = Modifier.width(16.dp))
+                    // Emirate
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Icon(
+                        imageVector = CocIcons.Info,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = data.emirateName,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
+                    )
+                }
+
+                // Plate number
+                if (!vehicle.plateNumber.isNullOrBlank()) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = CocIcons.Car,
                             contentDescription = null,
@@ -206,6 +308,7 @@ private fun DashboardContent(
                     }
                 }
 
+                // Mileage
                 if (vehicle.currentMileage > 0) {
                     Spacer(modifier = Modifier.height(4.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -223,12 +326,30 @@ private fun DashboardContent(
                         )
                     }
                 }
+
+                // Color
+                if (!vehicle.color.isNullOrBlank()) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = "🎨",
+                            style = MaterialTheme.typography.bodyMedium,
+                            modifier = Modifier.size(16.dp),
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = vehicle.color,
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
+                        )
+                    }
+                }
             }
         }
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Status Section
+        // Status
         Text(
             text = "Status",
             style = MaterialTheme.typography.titleMedium,
@@ -238,19 +359,19 @@ private fun DashboardContent(
 
         StatusCard(
             title = "Registration",
-            daysRemaining = state.registrationDaysLeft,
+            daysRemaining = data.registrationDaysLeft,
             expiryDateFormatted = dateFormatter.format(Date(vehicle.registrationExpiry)),
         )
         Spacer(modifier = Modifier.height(8.dp))
 
         StatusCard(
             title = "Inspection",
-            daysRemaining = state.inspectionDaysLeft,
+            daysRemaining = data.inspectionDaysLeft,
             expiryDateFormatted = dateFormatter.format(Date(vehicle.inspectionExpiry)),
         )
 
         // Mileage Chart
-        if (state.recentMileage.size >= 2) {
+        if (data.recentMileage.size >= 2) {
             Spacer(modifier = Modifier.height(24.dp))
             Text(
                 text = "Mileage Trend",
@@ -259,7 +380,7 @@ private fun DashboardContent(
             )
             Spacer(modifier = Modifier.height(12.dp))
             MileageChart(
-                entries = state.recentMileage,
+                entries = data.recentMileage,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(180.dp),
@@ -320,7 +441,7 @@ private fun DashboardContent(
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(80.dp)) // FAB space
     }
 }
 
@@ -361,7 +482,6 @@ private fun MileageChart(
             val chartWidth = size.width - leftPadding
             val chartHeight = size.height - bottomPadding
 
-            // Grid lines (3 horizontal)
             for (i in 0..2) {
                 val y = chartHeight * (1f - i / 2f)
                 drawLine(
@@ -380,7 +500,6 @@ private fun MileageChart(
                 )
             }
 
-            // Data points & line
             val path = Path()
             val points: List<Offset> = values.mapIndexed { index: Int, value: Float ->
                 val x = leftPadding + (index.toFloat() / (values.size - 1)) * chartWidth
@@ -399,12 +518,10 @@ private fun MileageChart(
                 style = Stroke(width = 3f, cap = StrokeCap.Round, join = StrokeJoin.Round),
             )
 
-            // Dots
             points.forEach { point: Offset ->
                 drawCircle(color = dotColor, radius = 5f, center = point)
             }
 
-            // Date labels (first, middle, last)
             val labelIndices = listOf(0, sorted.size / 2, sorted.size - 1).distinct()
             labelIndices.forEach { idx: Int ->
                 val x = leftPadding + (idx.toFloat() / (values.size - 1)) * chartWidth

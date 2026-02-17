@@ -9,17 +9,12 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
-import androidx.compose.runtime.collectAsState
 import com.mycaruae.app.notification.ReminderWorker
 import com.mycaruae.app.ui.MyCarUaeAppRoot
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
-    @Inject
-    lateinit var userPreferences: com.mycaruae.app.data.datastore.UserPreferences
 
     private val notificationPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -30,20 +25,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         requestNotificationPermission()
         ReminderWorker.schedule(this)
-        
-        // Collect theme preference synchronously or use a specialized approach?
-        // Better: Pass preferences/flow to MyCarUaeAppRoot or collect here.
-        // For simplicity and to avoid blocking main thread too much, we'll let Compose collect it.
-        // But MainActivity sets Content.
-        // Let's pass the repo/prefs to Root, or better yet, just let Root collect it if it has access.
-        // However, Root is a Composable.
-        
+
         setContent {
-            val userData = userPreferences.userData.collectAsState(initial = null).value
-            // Wait for data or use default system
-            val theme = userData?.theme ?: "system"
-            
-            MyCarUaeAppRoot(theme = theme)
+            MyCarUaeAppRoot(theme = "system")
         }
     }
 

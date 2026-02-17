@@ -1,66 +1,117 @@
 package com.mycaruae.app.ui.theme
 
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 
 private val LightColorScheme = lightColorScheme(
-    primary = Blue40,
+    // Primary — Deep Navy
+    primary = Navy40,
     onPrimary = Color.White,
-    primaryContainer = Blue90,
-    onPrimaryContainer = Blue10,
-    secondary = Color(0xFF545F70),
+    primaryContainer = Navy90,
+    onPrimaryContainer = Navy10,
+
+    // Secondary — Warm Amber
+    secondary = Amber40,
     onSecondary = Color.White,
-    secondaryContainer = Color(0xFFD8E2F8),
-    onSecondaryContainer = Color(0xFF111C2B),
-    tertiary = Color(0xFF6B5778),
+    secondaryContainer = Amber90,
+    onSecondaryContainer = Amber20,
+
+    // Tertiary — Slate accent
+    tertiary = Slate600,
     onTertiary = Color.White,
+    tertiaryContainer = Slate200,
+    onTertiaryContainer = Slate800,
+
+    // Error
     error = StatusRed,
     onError = Color.White,
-    errorContainer = StatusRedContainer,
-    background = Color(0xFFFDFBFF),
-    onBackground = Gray900,
-    surface = Color(0xFFFDFBFF),
-    onSurface = Gray900,
-    surfaceVariant = Gray100,
-    onSurfaceVariant = Gray600,
-    outline = Gray400,
+    errorContainer = StatusRedLight,
+    onErrorContainer = Color(0xFF410002),
+
+    // Background & Surface
+    background = Navy99,
+    onBackground = Slate900,
+    surface = Color.White,
+    onSurface = Slate900,
+    surfaceVariant = Slate100,
+    onSurfaceVariant = Slate500,
+    surfaceContainerLowest = Color.White,
+    surfaceContainerLow = Navy99,
+    surfaceContainer = Slate50,
+    surfaceContainerHigh = Slate100,
+    surfaceContainerHighest = Slate200,
+
+    // Outline
+    outline = Slate300,
+    outlineVariant = Slate200,
+
+    // Inverse
+    inverseSurface = Slate800,
+    inverseOnSurface = Slate100,
+    inversePrimary = Navy80,
+
+    // Scrim
+    scrim = Color(0xFF000000),
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Blue80,
-    onPrimary = Blue20,
-    primaryContainer = Blue30,
-    onPrimaryContainer = Blue90,
-    secondary = Color(0xFFBBC7DB),
-    onSecondary = Color(0xFF263141),
-    secondaryContainer = Color(0xFF3C4758),
-    onSecondaryContainer = Color(0xFFD8E2F8),
-    tertiary = Color(0xFFD7BDE4),
-    onTertiary = Color(0xFF3B2948),
-    error = Color(0xFFFFB4AB),
+    // Primary — Lighter Navy
+    primary = Navy80,
+    onPrimary = Navy20,
+    primaryContainer = Navy30,
+    onPrimaryContainer = Navy90,
+
+    // Secondary — Warm Amber glow
+    secondary = Amber80,
+    onSecondary = Amber20,
+    secondaryContainer = Amber30,
+    onSecondaryContainer = Amber90,
+
+    // Tertiary
+    tertiary = Slate400,
+    onTertiary = Slate800,
+    tertiaryContainer = Slate700,
+    onTertiaryContainer = Slate200,
+
+    // Error
+    error = StatusRedDark,
     onError = Color(0xFF690005),
     errorContainer = Color(0xFF93000A),
-    background = Color(0xFF1A1C1E),
-    onBackground = Color(0xFFE2E2E6),
-    surface = Color(0xFF1A1C1E),
-    onSurface = Color(0xFFE2E2E6),
-    surfaceVariant = Color(0xFF43474E),
-    onSurfaceVariant = Color(0xFFC3C6CF),
-    outline = Color(0xFF8D9199),
+    onErrorContainer = StatusRedLight,
+
+    // Background & Surface
+    background = Color(0xFF0D1117),
+    onBackground = Slate200,
+    surface = Color(0xFF131920),
+    onSurface = Slate200,
+    surfaceVariant = Color(0xFF1E2530),
+    onSurfaceVariant = Slate400,
+    surfaceContainerLowest = Color(0xFF0A0E14),
+    surfaceContainerLow = Color(0xFF111820),
+    surfaceContainer = Color(0xFF171E28),
+    surfaceContainerHigh = Color(0xFF1E2530),
+    surfaceContainerHighest = Color(0xFF272F3A),
+
+    // Outline
+    outline = Slate600,
+    outlineVariant = Slate700,
+
+    // Inverse
+    inverseSurface = Slate200,
+    inverseOnSurface = Slate800,
+    inversePrimary = Navy40,
+
+    // Scrim
+    scrim = Color(0xFF000000),
 )
 
 @Composable
 fun MyCarUaeTheme(
     themePreference: String = "system",
-    dynamicColor: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     val darkTheme = when (themePreference) {
@@ -69,15 +120,7 @@ fun MyCarUaeTheme(
         else -> isSystemInDarkTheme()
     }
 
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context)
-            else dynamicLightColorScheme(context)
-        }
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,

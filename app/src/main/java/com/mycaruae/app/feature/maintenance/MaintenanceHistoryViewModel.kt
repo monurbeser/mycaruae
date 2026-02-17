@@ -39,12 +39,12 @@ class MaintenanceHistoryViewModel @Inject constructor(
 
     private fun loadHistory() {
         viewModelScope.launch {
-            val userId = userPreferences.userData.first().userId
-            val vehicle = vehicleRepository.getVehicle(userId).first()
-            if (vehicle != null) {
+            val userData = userPreferences.userData.first()
+            val vehicleId = userData.activeVehicleId
+            if (vehicleId.isNotBlank()) {
                 combine(
-                    maintenanceRepository.getHistory(vehicle.id),
-                    maintenanceRepository.getTotalCost(vehicle.id),
+                    maintenanceRepository.getHistory(vehicleId),
+                    maintenanceRepository.getTotalCost(vehicleId),
                 ) { records, totalCost ->
                     MaintenanceHistoryUiState(
                         records = records,
@@ -56,7 +56,23 @@ class MaintenanceHistoryViewModel @Inject constructor(
                     _uiState.value = state
                 }
             } else {
-                _uiState.update { it.copy(isLoading = false) }
+                val vehicle = vehicleRepository.getVehicle(userData.userId).first()
+                if (vehicle != null) {
+                    combine(
+                        maintenanceRepository.getHistory(vehicle.id),
+                        maintenanceRepository.getTotalCost(vehicle.id),
+                    ) { records, totalCost ->
+                        MaintenanceHistoryUiState(
+                            records = records,
+                            totalCost = totalCost ?: 0.0,
+                            isLoading = false,
+                        )
+                    }.collect { state ->
+                        _uiState.value = state
+                    }
+                } else {
+                    _uiState.update { it.copy(isLoading = false) }
+                }
             }
         }
     }

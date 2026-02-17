@@ -1,6 +1,7 @@
 package com.mycaruae.app.data.database.dao;
 
 import android.database.Cursor;
+import android.os.CancellationSignal;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.room.CoroutinesRoom;
@@ -15,10 +16,12 @@ import androidx.sqlite.db.SupportSQLiteStatement;
 import com.mycaruae.app.data.database.entity.VehicleEntity;
 import java.lang.Class;
 import java.lang.Exception;
+import java.lang.Integer;
 import java.lang.Object;
 import java.lang.Override;
 import java.lang.String;
 import java.lang.SuppressWarnings;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -417,6 +420,326 @@ public final class VehicleDao_Impl implements VehicleDao {
         _statement.release();
       }
     });
+  }
+
+  @Override
+  public Flow<List<VehicleEntity>> getAllByUser(final String userId) {
+    final String _sql = "SELECT * FROM vehicles WHERE userId = ? ORDER BY createdAt DESC";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 1);
+    int _argIndex = 1;
+    _statement.bindString(_argIndex, userId);
+    return CoroutinesRoom.createFlow(__db, false, new String[] {"vehicles"}, new Callable<List<VehicleEntity>>() {
+      @Override
+      @NonNull
+      public List<VehicleEntity> call() throws Exception {
+        final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+        try {
+          final int _cursorIndexOfId = CursorUtil.getColumnIndexOrThrow(_cursor, "id");
+          final int _cursorIndexOfUserId = CursorUtil.getColumnIndexOrThrow(_cursor, "userId");
+          final int _cursorIndexOfBrandId = CursorUtil.getColumnIndexOrThrow(_cursor, "brandId");
+          final int _cursorIndexOfModelId = CursorUtil.getColumnIndexOrThrow(_cursor, "modelId");
+          final int _cursorIndexOfYear = CursorUtil.getColumnIndexOrThrow(_cursor, "year");
+          final int _cursorIndexOfEmirate = CursorUtil.getColumnIndexOrThrow(_cursor, "emirate");
+          final int _cursorIndexOfRegistrationExpiry = CursorUtil.getColumnIndexOrThrow(_cursor, "registrationExpiry");
+          final int _cursorIndexOfInspectionExpiry = CursorUtil.getColumnIndexOrThrow(_cursor, "inspectionExpiry");
+          final int _cursorIndexOfVin = CursorUtil.getColumnIndexOrThrow(_cursor, "vin");
+          final int _cursorIndexOfPlateNumber = CursorUtil.getColumnIndexOrThrow(_cursor, "plateNumber");
+          final int _cursorIndexOfColor = CursorUtil.getColumnIndexOrThrow(_cursor, "color");
+          final int _cursorIndexOfCurrentMileage = CursorUtil.getColumnIndexOrThrow(_cursor, "currentMileage");
+          final int _cursorIndexOfPhotoUris = CursorUtil.getColumnIndexOrThrow(_cursor, "photoUris");
+          final int _cursorIndexOfPendingSync = CursorUtil.getColumnIndexOrThrow(_cursor, "pendingSync");
+          final int _cursorIndexOfCreatedAt = CursorUtil.getColumnIndexOrThrow(_cursor, "createdAt");
+          final int _cursorIndexOfUpdatedAt = CursorUtil.getColumnIndexOrThrow(_cursor, "updatedAt");
+          final List<VehicleEntity> _result = new ArrayList<VehicleEntity>(_cursor.getCount());
+          while (_cursor.moveToNext()) {
+            final VehicleEntity _item;
+            final String _tmpId;
+            _tmpId = _cursor.getString(_cursorIndexOfId);
+            final String _tmpUserId;
+            _tmpUserId = _cursor.getString(_cursorIndexOfUserId);
+            final String _tmpBrandId;
+            _tmpBrandId = _cursor.getString(_cursorIndexOfBrandId);
+            final String _tmpModelId;
+            _tmpModelId = _cursor.getString(_cursorIndexOfModelId);
+            final int _tmpYear;
+            _tmpYear = _cursor.getInt(_cursorIndexOfYear);
+            final String _tmpEmirate;
+            _tmpEmirate = _cursor.getString(_cursorIndexOfEmirate);
+            final long _tmpRegistrationExpiry;
+            _tmpRegistrationExpiry = _cursor.getLong(_cursorIndexOfRegistrationExpiry);
+            final long _tmpInspectionExpiry;
+            _tmpInspectionExpiry = _cursor.getLong(_cursorIndexOfInspectionExpiry);
+            final String _tmpVin;
+            if (_cursor.isNull(_cursorIndexOfVin)) {
+              _tmpVin = null;
+            } else {
+              _tmpVin = _cursor.getString(_cursorIndexOfVin);
+            }
+            final String _tmpPlateNumber;
+            if (_cursor.isNull(_cursorIndexOfPlateNumber)) {
+              _tmpPlateNumber = null;
+            } else {
+              _tmpPlateNumber = _cursor.getString(_cursorIndexOfPlateNumber);
+            }
+            final String _tmpColor;
+            if (_cursor.isNull(_cursorIndexOfColor)) {
+              _tmpColor = null;
+            } else {
+              _tmpColor = _cursor.getString(_cursorIndexOfColor);
+            }
+            final int _tmpCurrentMileage;
+            _tmpCurrentMileage = _cursor.getInt(_cursorIndexOfCurrentMileage);
+            final String _tmpPhotoUris;
+            if (_cursor.isNull(_cursorIndexOfPhotoUris)) {
+              _tmpPhotoUris = null;
+            } else {
+              _tmpPhotoUris = _cursor.getString(_cursorIndexOfPhotoUris);
+            }
+            final boolean _tmpPendingSync;
+            final int _tmp;
+            _tmp = _cursor.getInt(_cursorIndexOfPendingSync);
+            _tmpPendingSync = _tmp != 0;
+            final long _tmpCreatedAt;
+            _tmpCreatedAt = _cursor.getLong(_cursorIndexOfCreatedAt);
+            final long _tmpUpdatedAt;
+            _tmpUpdatedAt = _cursor.getLong(_cursorIndexOfUpdatedAt);
+            _item = new VehicleEntity(_tmpId,_tmpUserId,_tmpBrandId,_tmpModelId,_tmpYear,_tmpEmirate,_tmpRegistrationExpiry,_tmpInspectionExpiry,_tmpVin,_tmpPlateNumber,_tmpColor,_tmpCurrentMileage,_tmpPhotoUris,_tmpPendingSync,_tmpCreatedAt,_tmpUpdatedAt);
+            _result.add(_item);
+          }
+          return _result;
+        } finally {
+          _cursor.close();
+        }
+      }
+
+      @Override
+      protected void finalize() {
+        _statement.release();
+      }
+    });
+  }
+
+  @Override
+  public Flow<VehicleEntity> getById(final String vehicleId) {
+    final String _sql = "SELECT * FROM vehicles WHERE id = ?";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 1);
+    int _argIndex = 1;
+    _statement.bindString(_argIndex, vehicleId);
+    return CoroutinesRoom.createFlow(__db, false, new String[] {"vehicles"}, new Callable<VehicleEntity>() {
+      @Override
+      @Nullable
+      public VehicleEntity call() throws Exception {
+        final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+        try {
+          final int _cursorIndexOfId = CursorUtil.getColumnIndexOrThrow(_cursor, "id");
+          final int _cursorIndexOfUserId = CursorUtil.getColumnIndexOrThrow(_cursor, "userId");
+          final int _cursorIndexOfBrandId = CursorUtil.getColumnIndexOrThrow(_cursor, "brandId");
+          final int _cursorIndexOfModelId = CursorUtil.getColumnIndexOrThrow(_cursor, "modelId");
+          final int _cursorIndexOfYear = CursorUtil.getColumnIndexOrThrow(_cursor, "year");
+          final int _cursorIndexOfEmirate = CursorUtil.getColumnIndexOrThrow(_cursor, "emirate");
+          final int _cursorIndexOfRegistrationExpiry = CursorUtil.getColumnIndexOrThrow(_cursor, "registrationExpiry");
+          final int _cursorIndexOfInspectionExpiry = CursorUtil.getColumnIndexOrThrow(_cursor, "inspectionExpiry");
+          final int _cursorIndexOfVin = CursorUtil.getColumnIndexOrThrow(_cursor, "vin");
+          final int _cursorIndexOfPlateNumber = CursorUtil.getColumnIndexOrThrow(_cursor, "plateNumber");
+          final int _cursorIndexOfColor = CursorUtil.getColumnIndexOrThrow(_cursor, "color");
+          final int _cursorIndexOfCurrentMileage = CursorUtil.getColumnIndexOrThrow(_cursor, "currentMileage");
+          final int _cursorIndexOfPhotoUris = CursorUtil.getColumnIndexOrThrow(_cursor, "photoUris");
+          final int _cursorIndexOfPendingSync = CursorUtil.getColumnIndexOrThrow(_cursor, "pendingSync");
+          final int _cursorIndexOfCreatedAt = CursorUtil.getColumnIndexOrThrow(_cursor, "createdAt");
+          final int _cursorIndexOfUpdatedAt = CursorUtil.getColumnIndexOrThrow(_cursor, "updatedAt");
+          final VehicleEntity _result;
+          if (_cursor.moveToFirst()) {
+            final String _tmpId;
+            _tmpId = _cursor.getString(_cursorIndexOfId);
+            final String _tmpUserId;
+            _tmpUserId = _cursor.getString(_cursorIndexOfUserId);
+            final String _tmpBrandId;
+            _tmpBrandId = _cursor.getString(_cursorIndexOfBrandId);
+            final String _tmpModelId;
+            _tmpModelId = _cursor.getString(_cursorIndexOfModelId);
+            final int _tmpYear;
+            _tmpYear = _cursor.getInt(_cursorIndexOfYear);
+            final String _tmpEmirate;
+            _tmpEmirate = _cursor.getString(_cursorIndexOfEmirate);
+            final long _tmpRegistrationExpiry;
+            _tmpRegistrationExpiry = _cursor.getLong(_cursorIndexOfRegistrationExpiry);
+            final long _tmpInspectionExpiry;
+            _tmpInspectionExpiry = _cursor.getLong(_cursorIndexOfInspectionExpiry);
+            final String _tmpVin;
+            if (_cursor.isNull(_cursorIndexOfVin)) {
+              _tmpVin = null;
+            } else {
+              _tmpVin = _cursor.getString(_cursorIndexOfVin);
+            }
+            final String _tmpPlateNumber;
+            if (_cursor.isNull(_cursorIndexOfPlateNumber)) {
+              _tmpPlateNumber = null;
+            } else {
+              _tmpPlateNumber = _cursor.getString(_cursorIndexOfPlateNumber);
+            }
+            final String _tmpColor;
+            if (_cursor.isNull(_cursorIndexOfColor)) {
+              _tmpColor = null;
+            } else {
+              _tmpColor = _cursor.getString(_cursorIndexOfColor);
+            }
+            final int _tmpCurrentMileage;
+            _tmpCurrentMileage = _cursor.getInt(_cursorIndexOfCurrentMileage);
+            final String _tmpPhotoUris;
+            if (_cursor.isNull(_cursorIndexOfPhotoUris)) {
+              _tmpPhotoUris = null;
+            } else {
+              _tmpPhotoUris = _cursor.getString(_cursorIndexOfPhotoUris);
+            }
+            final boolean _tmpPendingSync;
+            final int _tmp;
+            _tmp = _cursor.getInt(_cursorIndexOfPendingSync);
+            _tmpPendingSync = _tmp != 0;
+            final long _tmpCreatedAt;
+            _tmpCreatedAt = _cursor.getLong(_cursorIndexOfCreatedAt);
+            final long _tmpUpdatedAt;
+            _tmpUpdatedAt = _cursor.getLong(_cursorIndexOfUpdatedAt);
+            _result = new VehicleEntity(_tmpId,_tmpUserId,_tmpBrandId,_tmpModelId,_tmpYear,_tmpEmirate,_tmpRegistrationExpiry,_tmpInspectionExpiry,_tmpVin,_tmpPlateNumber,_tmpColor,_tmpCurrentMileage,_tmpPhotoUris,_tmpPendingSync,_tmpCreatedAt,_tmpUpdatedAt);
+          } else {
+            _result = null;
+          }
+          return _result;
+        } finally {
+          _cursor.close();
+        }
+      }
+
+      @Override
+      protected void finalize() {
+        _statement.release();
+      }
+    });
+  }
+
+  @Override
+  public Object getByIdOnce(final String vehicleId,
+      final Continuation<? super VehicleEntity> $completion) {
+    final String _sql = "SELECT * FROM vehicles WHERE id = ?";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 1);
+    int _argIndex = 1;
+    _statement.bindString(_argIndex, vehicleId);
+    final CancellationSignal _cancellationSignal = DBUtil.createCancellationSignal();
+    return CoroutinesRoom.execute(__db, false, _cancellationSignal, new Callable<VehicleEntity>() {
+      @Override
+      @Nullable
+      public VehicleEntity call() throws Exception {
+        final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+        try {
+          final int _cursorIndexOfId = CursorUtil.getColumnIndexOrThrow(_cursor, "id");
+          final int _cursorIndexOfUserId = CursorUtil.getColumnIndexOrThrow(_cursor, "userId");
+          final int _cursorIndexOfBrandId = CursorUtil.getColumnIndexOrThrow(_cursor, "brandId");
+          final int _cursorIndexOfModelId = CursorUtil.getColumnIndexOrThrow(_cursor, "modelId");
+          final int _cursorIndexOfYear = CursorUtil.getColumnIndexOrThrow(_cursor, "year");
+          final int _cursorIndexOfEmirate = CursorUtil.getColumnIndexOrThrow(_cursor, "emirate");
+          final int _cursorIndexOfRegistrationExpiry = CursorUtil.getColumnIndexOrThrow(_cursor, "registrationExpiry");
+          final int _cursorIndexOfInspectionExpiry = CursorUtil.getColumnIndexOrThrow(_cursor, "inspectionExpiry");
+          final int _cursorIndexOfVin = CursorUtil.getColumnIndexOrThrow(_cursor, "vin");
+          final int _cursorIndexOfPlateNumber = CursorUtil.getColumnIndexOrThrow(_cursor, "plateNumber");
+          final int _cursorIndexOfColor = CursorUtil.getColumnIndexOrThrow(_cursor, "color");
+          final int _cursorIndexOfCurrentMileage = CursorUtil.getColumnIndexOrThrow(_cursor, "currentMileage");
+          final int _cursorIndexOfPhotoUris = CursorUtil.getColumnIndexOrThrow(_cursor, "photoUris");
+          final int _cursorIndexOfPendingSync = CursorUtil.getColumnIndexOrThrow(_cursor, "pendingSync");
+          final int _cursorIndexOfCreatedAt = CursorUtil.getColumnIndexOrThrow(_cursor, "createdAt");
+          final int _cursorIndexOfUpdatedAt = CursorUtil.getColumnIndexOrThrow(_cursor, "updatedAt");
+          final VehicleEntity _result;
+          if (_cursor.moveToFirst()) {
+            final String _tmpId;
+            _tmpId = _cursor.getString(_cursorIndexOfId);
+            final String _tmpUserId;
+            _tmpUserId = _cursor.getString(_cursorIndexOfUserId);
+            final String _tmpBrandId;
+            _tmpBrandId = _cursor.getString(_cursorIndexOfBrandId);
+            final String _tmpModelId;
+            _tmpModelId = _cursor.getString(_cursorIndexOfModelId);
+            final int _tmpYear;
+            _tmpYear = _cursor.getInt(_cursorIndexOfYear);
+            final String _tmpEmirate;
+            _tmpEmirate = _cursor.getString(_cursorIndexOfEmirate);
+            final long _tmpRegistrationExpiry;
+            _tmpRegistrationExpiry = _cursor.getLong(_cursorIndexOfRegistrationExpiry);
+            final long _tmpInspectionExpiry;
+            _tmpInspectionExpiry = _cursor.getLong(_cursorIndexOfInspectionExpiry);
+            final String _tmpVin;
+            if (_cursor.isNull(_cursorIndexOfVin)) {
+              _tmpVin = null;
+            } else {
+              _tmpVin = _cursor.getString(_cursorIndexOfVin);
+            }
+            final String _tmpPlateNumber;
+            if (_cursor.isNull(_cursorIndexOfPlateNumber)) {
+              _tmpPlateNumber = null;
+            } else {
+              _tmpPlateNumber = _cursor.getString(_cursorIndexOfPlateNumber);
+            }
+            final String _tmpColor;
+            if (_cursor.isNull(_cursorIndexOfColor)) {
+              _tmpColor = null;
+            } else {
+              _tmpColor = _cursor.getString(_cursorIndexOfColor);
+            }
+            final int _tmpCurrentMileage;
+            _tmpCurrentMileage = _cursor.getInt(_cursorIndexOfCurrentMileage);
+            final String _tmpPhotoUris;
+            if (_cursor.isNull(_cursorIndexOfPhotoUris)) {
+              _tmpPhotoUris = null;
+            } else {
+              _tmpPhotoUris = _cursor.getString(_cursorIndexOfPhotoUris);
+            }
+            final boolean _tmpPendingSync;
+            final int _tmp;
+            _tmp = _cursor.getInt(_cursorIndexOfPendingSync);
+            _tmpPendingSync = _tmp != 0;
+            final long _tmpCreatedAt;
+            _tmpCreatedAt = _cursor.getLong(_cursorIndexOfCreatedAt);
+            final long _tmpUpdatedAt;
+            _tmpUpdatedAt = _cursor.getLong(_cursorIndexOfUpdatedAt);
+            _result = new VehicleEntity(_tmpId,_tmpUserId,_tmpBrandId,_tmpModelId,_tmpYear,_tmpEmirate,_tmpRegistrationExpiry,_tmpInspectionExpiry,_tmpVin,_tmpPlateNumber,_tmpColor,_tmpCurrentMileage,_tmpPhotoUris,_tmpPendingSync,_tmpCreatedAt,_tmpUpdatedAt);
+          } else {
+            _result = null;
+          }
+          return _result;
+        } finally {
+          _cursor.close();
+          _statement.release();
+        }
+      }
+    }, $completion);
+  }
+
+  @Override
+  public Object getVehicleCount(final String userId,
+      final Continuation<? super Integer> $completion) {
+    final String _sql = "SELECT COUNT(*) FROM vehicles WHERE userId = ?";
+    final RoomSQLiteQuery _statement = RoomSQLiteQuery.acquire(_sql, 1);
+    int _argIndex = 1;
+    _statement.bindString(_argIndex, userId);
+    final CancellationSignal _cancellationSignal = DBUtil.createCancellationSignal();
+    return CoroutinesRoom.execute(__db, false, _cancellationSignal, new Callable<Integer>() {
+      @Override
+      @NonNull
+      public Integer call() throws Exception {
+        final Cursor _cursor = DBUtil.query(__db, _statement, false, null);
+        try {
+          final Integer _result;
+          if (_cursor.moveToFirst()) {
+            final int _tmp;
+            _tmp = _cursor.getInt(0);
+            _result = _tmp;
+          } else {
+            _result = 0;
+          }
+          return _result;
+        } finally {
+          _cursor.close();
+          _statement.release();
+        }
+      }
+    }, $completion);
   }
 
   @NonNull
