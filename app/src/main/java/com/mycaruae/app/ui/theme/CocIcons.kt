@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Error
@@ -45,4 +46,5 @@ object CocIcons {
     val Warning = Icons.Default.Warning
     val Error = Icons.Default.Error
     val Info = Icons.Default.Info
+    val Shield = Icons.Default.Security
 }

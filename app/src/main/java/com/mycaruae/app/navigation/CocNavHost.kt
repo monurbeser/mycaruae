@@ -9,9 +9,9 @@ import com.mycaruae.app.feature.auth.LoginScreen
 import com.mycaruae.app.feature.auth.RegisterScreen
 import com.mycaruae.app.feature.auth.ResetPasswordScreen
 import com.mycaruae.app.feature.dashboard.DashboardScreen
+import com.mycaruae.app.feature.insurance.InsuranceAddScreen
 import com.mycaruae.app.feature.maintenance.MaintenanceAddScreen
 import com.mycaruae.app.feature.maintenance.MaintenanceDetailScreen
-import com.mycaruae.app.feature.maintenance.MaintenanceHistoryScreen
 import com.mycaruae.app.feature.mileage.MileageEntryScreen
 import com.mycaruae.app.feature.mileage.MileageHistoryScreen
 import com.mycaruae.app.feature.onboarding.OnboardingScreen
@@ -19,6 +19,7 @@ import com.mycaruae.app.feature.registration.RegistrationDetailScreen
 import com.mycaruae.app.feature.registration.RegistrationRenewScreen
 import com.mycaruae.app.feature.reminders.ReminderCreateScreen
 import com.mycaruae.app.feature.reminders.RemindersScreen
+import com.mycaruae.app.feature.services.ServicesScreen
 import com.mycaruae.app.feature.settings.SettingsScreen
 import com.mycaruae.app.feature.splash.SplashScreen
 import com.mycaruae.app.feature.vehicle.VehicleAddScreen
@@ -112,23 +113,18 @@ fun CocNavHost(
                 onNavigateToMileageEntry = { navController.navigate(Screen.MileageEntry.route) },
                 onNavigateToMaintenanceAdd = { navController.navigate(Screen.MaintenanceAdd.route) },
                 onNavigateToReminderCreate = { navController.navigate(Screen.ReminderCreate.route) },
-                onNavigateToVehicleAdd = {
-                    navController.navigate(Screen.VehicleAdd.route)
-                },
-                onNavigateToMileageHistory = {
-                    navController.navigate(Screen.MileageHistory.route)
-                },
-                onNavigateToVehicleEdit = {
-                    navController.navigate(Screen.VehicleEdit.route)
-                },
+                onNavigateToVehicleAdd = { navController.navigate(Screen.VehicleAdd.route) },
+                onNavigateToMileageHistory = { navController.navigate(Screen.MileageHistory.route) },
+                onNavigateToVehicleEdit = { navController.navigate(Screen.VehicleEdit.route) },
             )
         }
-        composable(Screen.MaintenanceHistory.route) {
-            MaintenanceHistoryScreen(
-                onNavigateToDetail = { id ->
+        composable(Screen.Services.route) {
+            ServicesScreen(
+                onNavigateToMaintenanceDetail = { id ->
                     navController.navigate(Screen.MaintenanceDetail.createRoute(id))
                 },
-                onNavigateToAdd = { navController.navigate(Screen.MaintenanceAdd.route) },
+                onNavigateToMaintenanceAdd = { navController.navigate(Screen.MaintenanceAdd.route) },
+                onNavigateToInsuranceAdd = { navController.navigate(Screen.InsuranceAdd.route) },
             )
         }
         composable(Screen.Reminders.route) {
@@ -162,6 +158,9 @@ fun CocNavHost(
         }
         composable(Screen.ReminderCreate.route) {
             ReminderCreateScreen(onNavigateBack = { navController.popBackStack() })
+        }
+        composable(Screen.InsuranceAdd.route) {
+            InsuranceAddScreen(onNavigateBack = { navController.popBackStack() })
         }
         composable(Screen.RegistrationDetail.route) {
             RegistrationDetailScreen(onNavigateBack = { navController.popBackStack() })

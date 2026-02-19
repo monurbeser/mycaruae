@@ -9,6 +9,7 @@ sealed class Screen(val route: String) {
     data object VehicleAdd : Screen("vehicle_add")
     data object VehicleEdit : Screen("vehicle_edit")
     data object Dashboard : Screen("dashboard")
+    data object Services : Screen("services")
     data object MileageEntry : Screen("mileage_entry")
     data object MileageHistory : Screen("mileage_history")
     data object MaintenanceAdd : Screen("maintenance_add")
@@ -18,6 +19,8 @@ sealed class Screen(val route: String) {
     }
     data object Reminders : Screen("reminders")
     data object ReminderCreate : Screen("reminder_create")
+    data object Insurance : Screen("insurance")
+    data object InsuranceAdd : Screen("insurance_add")
     data object RegistrationDetail : Screen("registration_detail/{type}") {
         fun createRoute(type: String) = "registration_detail/$type"
     }
@@ -30,7 +33,7 @@ sealed class Screen(val route: String) {
 
 val bottomNavScreens = listOf(
     Screen.Dashboard,
-    Screen.MaintenanceHistory,
+    Screen.Services,
     Screen.Reminders,
     Screen.Profile,
 )

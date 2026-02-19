@@ -15,6 +15,8 @@ import com.mycaruae.app.data.database.dao.BrandDao;
 import com.mycaruae.app.data.database.dao.BrandDao_Impl;
 import com.mycaruae.app.data.database.dao.EmirateDao;
 import com.mycaruae.app.data.database.dao.EmirateDao_Impl;
+import com.mycaruae.app.data.database.dao.InsuranceDao;
+import com.mycaruae.app.data.database.dao.InsuranceDao_Impl;
 import com.mycaruae.app.data.database.dao.MaintenanceDao;
 import com.mycaruae.app.data.database.dao.MaintenanceDao_Impl;
 import com.mycaruae.app.data.database.dao.MileageLogDao;
@@ -55,10 +57,12 @@ public final class CocDatabase_Impl extends CocDatabase {
 
   private volatile RenewalLogDao _renewalLogDao;
 
+  private volatile InsuranceDao _insuranceDao;
+
   @Override
   @NonNull
   protected SupportSQLiteOpenHelper createOpenHelper(@NonNull final DatabaseConfiguration config) {
-    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(1) {
+    final SupportSQLiteOpenHelper.Callback _openCallback = new RoomOpenHelper(config, new RoomOpenHelper.Delegate(2) {
       @Override
       public void createAllTables(@NonNull final SupportSQLiteDatabase db) {
         db.execSQL("CREATE TABLE IF NOT EXISTS `emirates` (`id` TEXT NOT NULL, `nameEn` TEXT NOT NULL, `trafficAuthority` TEXT NOT NULL, `registrationUrl` TEXT NOT NULL, `inspectionUrl` TEXT, `phone` TEXT, PRIMARY KEY(`id`))");
@@ -72,8 +76,10 @@ public final class CocDatabase_Impl extends CocDatabase {
         db.execSQL("CREATE INDEX IF NOT EXISTS `index_reminders_vehicleId` ON `reminders` (`vehicleId`)");
         db.execSQL("CREATE TABLE IF NOT EXISTS `renewal_logs` (`id` TEXT NOT NULL, `vehicleId` TEXT NOT NULL, `renewalType` TEXT NOT NULL, `previousExpiry` INTEGER NOT NULL, `newExpiry` INTEGER NOT NULL, `renewalDate` INTEGER NOT NULL, `cost` REAL, `note` TEXT, `pendingSync` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`vehicleId`) REFERENCES `vehicles`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )");
         db.execSQL("CREATE INDEX IF NOT EXISTS `index_renewal_logs_vehicleId` ON `renewal_logs` (`vehicleId`)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS `insurance` (`id` TEXT NOT NULL, `vehicleId` TEXT NOT NULL, `companyName` TEXT NOT NULL, `type` TEXT NOT NULL, `startDate` INTEGER NOT NULL, `endDate` INTEGER NOT NULL, `documentUri` TEXT, `status` TEXT NOT NULL, `pendingSync` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL, `updatedAt` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`vehicleId`) REFERENCES `vehicles`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )");
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_insurance_vehicleId` ON `insurance` (`vehicleId`)");
         db.execSQL("CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)");
-        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6d77ebd0ff4e00eba0c221c3563827a0')");
+        db.execSQL("INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '630e1d82140a83ac22c511c25e7a08b3')");
       }
 
       @Override
@@ -85,6 +91,7 @@ public final class CocDatabase_Impl extends CocDatabase {
         db.execSQL("DROP TABLE IF EXISTS `maintenance_records`");
         db.execSQL("DROP TABLE IF EXISTS `reminders`");
         db.execSQL("DROP TABLE IF EXISTS `renewal_logs`");
+        db.execSQL("DROP TABLE IF EXISTS `insurance`");
         final List<? extends RoomDatabase.Callback> _callbacks = mCallbacks;
         if (_callbacks != null) {
           for (RoomDatabase.Callback _callback : _callbacks) {
@@ -276,9 +283,32 @@ public final class CocDatabase_Impl extends CocDatabase {
                   + " Expected:\n" + _infoRenewalLogs + "\n"
                   + " Found:\n" + _existingRenewalLogs);
         }
+        final HashMap<String, TableInfo.Column> _columnsInsurance = new HashMap<String, TableInfo.Column>(11);
+        _columnsInsurance.put("id", new TableInfo.Column("id", "TEXT", true, 1, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsInsurance.put("vehicleId", new TableInfo.Column("vehicleId", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsInsurance.put("companyName", new TableInfo.Column("companyName", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsInsurance.put("type", new TableInfo.Column("type", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsInsurance.put("startDate", new TableInfo.Column("startDate", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsInsurance.put("endDate", new TableInfo.Column("endDate", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsInsurance.put("documentUri", new TableInfo.Column("documentUri", "TEXT", false, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsInsurance.put("status", new TableInfo.Column("status", "TEXT", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsInsurance.put("pendingSync", new TableInfo.Column("pendingSync", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsInsurance.put("createdAt", new TableInfo.Column("createdAt", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        _columnsInsurance.put("updatedAt", new TableInfo.Column("updatedAt", "INTEGER", true, 0, null, TableInfo.CREATED_FROM_ENTITY));
+        final HashSet<TableInfo.ForeignKey> _foreignKeysInsurance = new HashSet<TableInfo.ForeignKey>(1);
+        _foreignKeysInsurance.add(new TableInfo.ForeignKey("vehicles", "CASCADE", "NO ACTION", Arrays.asList("vehicleId"), Arrays.asList("id")));
+        final HashSet<TableInfo.Index> _indicesInsurance = new HashSet<TableInfo.Index>(1);
+        _indicesInsurance.add(new TableInfo.Index("index_insurance_vehicleId", false, Arrays.asList("vehicleId"), Arrays.asList("ASC")));
+        final TableInfo _infoInsurance = new TableInfo("insurance", _columnsInsurance, _foreignKeysInsurance, _indicesInsurance);
+        final TableInfo _existingInsurance = TableInfo.read(db, "insurance");
+        if (!_infoInsurance.equals(_existingInsurance)) {
+          return new RoomOpenHelper.ValidationResult(false, "insurance(com.mycaruae.app.data.database.entity.InsuranceEntity).\n"
+                  + " Expected:\n" + _infoInsurance + "\n"
+                  + " Found:\n" + _existingInsurance);
+        }
         return new RoomOpenHelper.ValidationResult(true, null);
       }
-    }, "6d77ebd0ff4e00eba0c221c3563827a0", "9850b197c09d48b06fcfc0fdd8493a5b");
+    }, "630e1d82140a83ac22c511c25e7a08b3", "58c868657ce3459228bc920550f0daad");
     final SupportSQLiteOpenHelper.Configuration _sqliteConfig = SupportSQLiteOpenHelper.Configuration.builder(config.context).name(config.name).callback(_openCallback).build();
     final SupportSQLiteOpenHelper _helper = config.sqliteOpenHelperFactory.create(_sqliteConfig);
     return _helper;
@@ -289,7 +319,7 @@ public final class CocDatabase_Impl extends CocDatabase {
   protected InvalidationTracker createInvalidationTracker() {
     final HashMap<String, String> _shadowTablesMap = new HashMap<String, String>(0);
     final HashMap<String, Set<String>> _viewTables = new HashMap<String, Set<String>>(0);
-    return new InvalidationTracker(this, _shadowTablesMap, _viewTables, "emirates","brands","vehicles","mileage_logs","maintenance_records","reminders","renewal_logs");
+    return new InvalidationTracker(this, _shadowTablesMap, _viewTables, "emirates","brands","vehicles","mileage_logs","maintenance_records","reminders","renewal_logs","insurance");
   }
 
   @Override
@@ -312,6 +342,7 @@ public final class CocDatabase_Impl extends CocDatabase {
       _db.execSQL("DELETE FROM `maintenance_records`");
       _db.execSQL("DELETE FROM `reminders`");
       _db.execSQL("DELETE FROM `renewal_logs`");
+      _db.execSQL("DELETE FROM `insurance`");
       super.setTransactionSuccessful();
     } finally {
       super.endTransaction();
@@ -336,6 +367,7 @@ public final class CocDatabase_Impl extends CocDatabase {
     _typeConvertersMap.put(MaintenanceDao.class, MaintenanceDao_Impl.getRequiredConverters());
     _typeConvertersMap.put(ReminderDao.class, ReminderDao_Impl.getRequiredConverters());
     _typeConvertersMap.put(RenewalLogDao.class, RenewalLogDao_Impl.getRequiredConverters());
+    _typeConvertersMap.put(InsuranceDao.class, InsuranceDao_Impl.getRequiredConverters());
     return _typeConvertersMap;
   }
 
@@ -448,6 +480,20 @@ public final class CocDatabase_Impl extends CocDatabase {
           _renewalLogDao = new RenewalLogDao_Impl(this);
         }
         return _renewalLogDao;
+      }
+    }
+  }
+
+  @Override
+  public InsuranceDao insuranceDao() {
+    if (_insuranceDao != null) {
+      return _insuranceDao;
+    } else {
+      synchronized(this) {
+        if(_insuranceDao == null) {
+          _insuranceDao = new InsuranceDao_Impl(this);
+        }
+        return _insuranceDao;
       }
     }
   }

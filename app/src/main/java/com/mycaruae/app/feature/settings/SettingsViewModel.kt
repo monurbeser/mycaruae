@@ -6,6 +6,7 @@ import com.mycaruae.app.data.datastore.UserData
 import com.mycaruae.app.data.datastore.UserPreferences
 import com.mycaruae.app.data.repository.ReminderRepository
 import com.mycaruae.app.data.repository.VehicleRepository
+import com.mycaruae.app.notification.NotificationHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -30,6 +31,7 @@ class SettingsViewModel @Inject constructor(
     private val userPreferences: UserPreferences,
     private val vehicleRepository: VehicleRepository,
     private val reminderRepository: ReminderRepository,
+    private val notificationHelper: NotificationHelper,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SettingsUiState())
@@ -72,7 +74,6 @@ class SettingsViewModel @Inject constructor(
             val state = _uiState.value
             userPreferences.saveNotificationDays(state.notificationDays)
 
-            // Regenerate auto-reminders for all vehicles
             val userData = userPreferences.userData.first()
             val vehicles = vehicleRepository.getAllVehicles(userData.userId).first()
             vehicles.forEach { vehicle ->
@@ -94,6 +95,19 @@ class SettingsViewModel @Inject constructor(
 
             _uiState.update { it.copy(isSaved = true) }
         }
+    }
+
+    fun sendTestNotification(): Boolean {
+        val hasPermission = notificationHelper.hasPermission()
+        if (hasPermission) {
+            notificationHelper.showRegistrationReminder(
+                title = "Test Notification",
+                body = "Registration expires in 3 days!",
+                notificationId = 99999,
+                vehicleLabel = "Hyundai Elantra 2020 • P 12345",
+            )
+        }
+        return hasPermission
     }
 
     fun logout() {

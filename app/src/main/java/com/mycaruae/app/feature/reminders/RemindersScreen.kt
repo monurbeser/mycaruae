@@ -80,24 +80,29 @@ fun RemindersScreen(
                         .padding(padding)
                         .padding(horizontal = 24.dp),
                 ) {
-                    // Vehicle Expiries section
-                    item {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text(
-                            text = "Vehicle Expiries",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.onBackground,
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                    }
-
-                    items(state.expiries, key = { it.type }) { expiry ->
-                        StatusCard(
-                            title = expiry.title,
-                            daysRemaining = expiry.daysRemaining,
-                            expiryDateFormatted = dateFormatter.format(Date(expiry.expiryDate)),
-                        )
-                        Spacer(modifier = Modifier.height(8.dp))
+                    // Vehicle Expiries - grouped by vehicle
+                    val grouped = state.expiries.groupBy { it.vehicleLabel }
+                    grouped.forEach { (vehicleLabel, expiries) ->
+                        item(key = "header_$vehicleLabel") {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Text(
+                                text = vehicleLabel,
+                                style = MaterialTheme.typography.titleSmall,
+                                color = MaterialTheme.colorScheme.onBackground,
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                        items(
+                            items = expiries,
+                            key = { "${it.type}_${it.vehicleLabel}" },
+                        ) { expiry ->
+                            StatusCard(
+                                title = expiry.title,
+                                daysRemaining = expiry.daysRemaining,
+                                expiryDateFormatted = dateFormatter.format(Date(expiry.expiryDate)),
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
                     }
 
                     // Manual Reminders section

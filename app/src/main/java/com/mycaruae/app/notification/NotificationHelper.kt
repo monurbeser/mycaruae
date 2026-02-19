@@ -33,39 +33,76 @@ class NotificationHelper @Inject constructor(
         }
     }
 
-    fun showRegistrationReminder(title: String, body: String, notificationId: Int) {
+    fun showRegistrationReminder(
+        title: String,
+        body: String,
+        notificationId: Int,
+        vehicleLabel: String = "",
+        reminderType: String = "REGISTRATION",
+    ) {
         show(
             channelId = MyCarUaeApp.CHANNEL_REGISTRATION,
             title = title,
             body = body,
             notificationId = notificationId,
+            vehicleLabel = vehicleLabel,
+            reminderType = reminderType,
         )
     }
 
-    fun showInspectionReminder(title: String, body: String, notificationId: Int) {
+    fun showInspectionReminder(
+        title: String,
+        body: String,
+        notificationId: Int,
+        vehicleLabel: String = "",
+        reminderType: String = "INSPECTION",
+    ) {
         show(
             channelId = MyCarUaeApp.CHANNEL_INSPECTION,
             title = title,
             body = body,
             notificationId = notificationId,
+            vehicleLabel = vehicleLabel,
+            reminderType = reminderType,
         )
     }
 
-    fun showMaintenanceReminder(title: String, body: String, notificationId: Int) {
+    fun showMaintenanceReminder(
+        title: String,
+        body: String,
+        notificationId: Int,
+        vehicleLabel: String = "",
+        reminderType: String = "MAINTENANCE",
+    ) {
         show(
             channelId = MyCarUaeApp.CHANNEL_MAINTENANCE,
             title = title,
             body = body,
             notificationId = notificationId,
+            vehicleLabel = vehicleLabel,
+            reminderType = reminderType,
         )
     }
 
-    private fun show(channelId: String, title: String, body: String, notificationId: Int) {
+    private fun show(
+        channelId: String,
+        title: String,
+        body: String,
+        notificationId: Int,
+        vehicleLabel: String,
+        reminderType: String,
+    ) {
         if (!hasPermission()) return
 
         val intent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            // Don't restart the app — just bring existing task to front
+            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            putExtra("reminder_title", title)
+            putExtra("reminder_body", body)
+            putExtra("reminder_vehicle", vehicleLabel)
+            putExtra("reminder_type", reminderType)
         }
+
         val pendingIntent = PendingIntent.getActivity(
             context,
             notificationId,

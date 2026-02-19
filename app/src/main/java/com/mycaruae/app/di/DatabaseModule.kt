@@ -7,6 +7,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.mycaruae.app.data.database.CocDatabase
 import com.mycaruae.app.data.database.dao.BrandDao
 import com.mycaruae.app.data.database.dao.EmirateDao
+import com.mycaruae.app.data.database.dao.InsuranceDao
 import com.mycaruae.app.data.database.dao.MaintenanceDao
 import com.mycaruae.app.data.database.dao.MileageLogDao
 import com.mycaruae.app.data.database.dao.ReminderDao
@@ -61,4 +62,5 @@ object DatabaseModule {
     @Provides fun provideMaintenanceDao(db: CocDatabase): MaintenanceDao = db.maintenanceDao()
     @Provides fun provideReminderDao(db: CocDatabase): ReminderDao = db.reminderDao()
     @Provides fun provideRenewalLogDao(db: CocDatabase): RenewalLogDao = db.renewalLogDao()
+    @Provides fun provideInsuranceDao(db: CocDatabase): InsuranceDao = db.insuranceDao()
 }

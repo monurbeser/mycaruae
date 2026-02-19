@@ -1,112 +1,74 @@
 package com.mycaruae.app.ui.theme
 
+import android.app.Activity
+import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 
 private val LightColorScheme = lightColorScheme(
-    // Primary — Deep Navy
     primary = Navy40,
     onPrimary = Color.White,
     primaryContainer = Navy90,
     onPrimaryContainer = Navy10,
-
-    // Secondary — Warm Amber
     secondary = Amber40,
     onSecondary = Color.White,
     secondaryContainer = Amber90,
-    onSecondaryContainer = Amber20,
-
-    // Tertiary — Slate accent
-    tertiary = Slate600,
+    onSecondaryContainer = Amber10,
+    tertiary = StatusGreen,
     onTertiary = Color.White,
-    tertiaryContainer = Slate200,
-    onTertiaryContainer = Slate800,
-
-    // Error
+    tertiaryContainer = StatusGreenLight,
+    onTertiaryContainer = Color(0xFF002106),
     error = StatusRed,
     onError = Color.White,
     errorContainer = StatusRedLight,
     onErrorContainer = Color(0xFF410002),
-
-    // Background & Surface
-    background = Navy99,
+    background = Slate50,
     onBackground = Slate900,
     surface = Color.White,
     onSurface = Slate900,
     surfaceVariant = Slate100,
-    onSurfaceVariant = Slate500,
-    surfaceContainerLowest = Color.White,
-    surfaceContainerLow = Navy99,
-    surfaceContainer = Slate50,
-    surfaceContainerHigh = Slate100,
-    surfaceContainerHighest = Slate200,
-
-    // Outline
+    onSurfaceVariant = Slate600,
     outline = Slate300,
     outlineVariant = Slate200,
-
-    // Inverse
     inverseSurface = Slate800,
-    inverseOnSurface = Slate100,
-    inversePrimary = Navy80,
-
-    // Scrim
-    scrim = Color(0xFF000000),
+    inverseOnSurface = Slate50,
 )
 
 private val DarkColorScheme = darkColorScheme(
-    // Primary — Lighter Navy
     primary = Navy80,
     onPrimary = Navy20,
     primaryContainer = Navy30,
     onPrimaryContainer = Navy90,
-
-    // Secondary — Warm Amber glow
     secondary = Amber80,
     onSecondary = Amber20,
     secondaryContainer = Amber30,
     onSecondaryContainer = Amber90,
-
-    // Tertiary
-    tertiary = Slate400,
-    onTertiary = Slate800,
-    tertiaryContainer = Slate700,
-    onTertiaryContainer = Slate200,
-
-    // Error
+    tertiary = StatusGreenDark,
+    onTertiary = Color(0xFF003910),
+    tertiaryContainer = Color(0xFF005320),
+    onTertiaryContainer = StatusGreenDark,
     error = StatusRedDark,
     onError = Color(0xFF690005),
     errorContainer = Color(0xFF93000A),
-    onErrorContainer = StatusRedLight,
-
-    // Background & Surface
-    background = Color(0xFF0D1117),
+    onErrorContainer = StatusRedDark,
+    background = DarkSurface,
     onBackground = Slate200,
-    surface = Color(0xFF131920),
+    surface = DarkSurface,
     onSurface = Slate200,
-    surfaceVariant = Color(0xFF1E2530),
+    surfaceVariant = DarkSurfaceHigh,
     onSurfaceVariant = Slate400,
-    surfaceContainerLowest = Color(0xFF0A0E14),
-    surfaceContainerLow = Color(0xFF111820),
-    surfaceContainer = Color(0xFF171E28),
-    surfaceContainerHigh = Color(0xFF1E2530),
-    surfaceContainerHighest = Color(0xFF272F3A),
-
-    // Outline
     outline = Slate600,
     outlineVariant = Slate700,
-
-    // Inverse
     inverseSurface = Slate200,
     inverseOnSurface = Slate800,
-    inversePrimary = Navy40,
-
-    // Scrim
-    scrim = Color(0xFF000000),
 )
 
 @Composable
@@ -115,16 +77,29 @@ fun MyCarUaeTheme(
     content: @Composable () -> Unit,
 ) {
     val darkTheme = when (themePreference) {
-        "light" -> false
         "dark" -> true
+        "light" -> false
         else -> isSystemInDarkTheme()
     }
 
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            window.statusBarColor = colorScheme.background.toArgb()
+            window.navigationBarColor = colorScheme.background.toArgb()
+            WindowCompat.getInsetsController(window, view).apply {
+                isAppearanceLightStatusBars = !darkTheme
+                isAppearanceLightNavigationBars = !darkTheme
+            }
+        }
+    }
+
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = MyCarUaeTypography,
+        typography = AppTypography,
         content = content,
     )
 }

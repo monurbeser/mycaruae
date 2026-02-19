@@ -33,15 +33,18 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mycaruae.app.ui.components.CocTopBar
 import com.mycaruae.app.ui.components.LoadingScreen
 import com.mycaruae.app.ui.theme.CocIcons
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -52,6 +55,8 @@ fun SettingsScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
     var showLogoutConfirm by remember { mutableStateOf(false) }
 
     LaunchedEffect(state.isLoggedOut) {
@@ -178,6 +183,44 @@ fun SettingsScreen(
                         .height(48.dp),
                 ) {
                     Text(text = "Save Preferences", style = MaterialTheme.typography.labelLarge)
+                }
+
+                Spacer(modifier = Modifier.height(28.dp))
+                HorizontalDivider()
+                Spacer(modifier = Modifier.height(28.dp))
+
+                // Debug
+                Text(
+                    text = "Debug",
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+
+                OutlinedButton(
+                    onClick = {
+                        com.mycaruae.app.notification.ReminderWorker.runNow(context)
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Reminder check triggered")
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text("Run Reminder Check")
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedButton(
+                    onClick = {
+                        val sent = viewModel.sendTestNotification()
+                        scope.launch {
+                            snackbarHostState.showSnackbar(
+                                if (sent) "Notification sent!" else "Permission denied — enable in phone Settings"
+                            )
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Text("Send Test Notification")
                 }
 
                 Spacer(modifier = Modifier.height(28.dp))

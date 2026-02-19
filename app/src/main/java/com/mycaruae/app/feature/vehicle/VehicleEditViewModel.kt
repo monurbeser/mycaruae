@@ -47,6 +47,7 @@ data class VehicleEditUiState(
     val isLoading: Boolean = true,
     val isSaved: Boolean = false,
     val isDeleted: Boolean = false,
+    val hasRemainingVehicles: Boolean = false,
     val showDeleteConfirm: Boolean = false,
 )
 
@@ -76,8 +77,16 @@ class VehicleEditViewModel @Inject constructor(
 
     private fun loadVehicle() {
         viewModelScope.launch {
-            val userId = userPreferences.userData.first().userId
-            val vehicle = vehicleRepository.getVehicle(userId).first()
+            val userData = userPreferences.userData.first()
+            val activeId = userData.activeVehicleId
+
+            // Load active vehicle or fallback to first
+            val vehicle = if (activeId.isNotBlank()) {
+                vehicleRepository.getVehicleByIdOnce(activeId)
+            } else {
+                vehicleRepository.getVehicle(userData.userId).first()
+            }
+
             val allBrands = brandRepository.getAllBrands().first()
             val allEmirates = emirateRepository.getAllEmirates().first()
 
@@ -217,7 +226,6 @@ class VehicleEditViewModel @Inject constructor(
             )
             vehicleRepository.updateVehicle(updated)
 
-            // Regenerate reminders if expiry dates changed
             val notificationDays = userData.notificationDays
             if (state.registrationExpiry != state.originalRegistrationExpiry) {
                 reminderRepository.generateExpiryReminders(
@@ -244,9 +252,26 @@ class VehicleEditViewModel @Inject constructor(
 
     fun deleteVehicle() {
         viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true) }
-            vehicleRepository.deleteVehicle(_uiState.value.vehicleId)
-            _uiState.update { it.copy(isLoading = false, isDeleted = true) }
+            _uiState.update { it.copy(isLoading = true, showDeleteConfirm = false) }
+            val vehicleId = _uiState.value.vehicleId
+            val userData = userPreferences.userData.first()
+
+            vehicleRepository.deleteVehicle(vehicleId)
+
+            // Check remaining vehicles
+            val remaining = vehicleRepository.getAllVehicles(userData.userId).first()
+            if (remaining.isNotEmpty()) {
+                // Set first remaining as active
+                userPreferences.setActiveVehicleId(remaining.first().id)
+                _uiState.update {
+                    it.copy(isLoading = false, isDeleted = true, hasRemainingVehicles = true)
+                }
+            } else {
+                userPreferences.setActiveVehicleId("")
+                _uiState.update {
+                    it.copy(isLoading = false, isDeleted = true, hasRemainingVehicles = false)
+                }
+            }
         }
     }
 }

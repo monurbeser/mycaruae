@@ -6,6 +6,8 @@ import com.mycaruae.app.di.DatabaseModule;
 import com.mycaruae.app.di.NetworkModule;
 import com.mycaruae.app.feature.auth.AuthViewModel_HiltModules;
 import com.mycaruae.app.feature.dashboard.DashboardViewModel_HiltModules;
+import com.mycaruae.app.feature.insurance.InsuranceAddViewModel_HiltModules;
+import com.mycaruae.app.feature.insurance.InsuranceListViewModel_HiltModules;
 import com.mycaruae.app.feature.maintenance.MaintenanceAddViewModel_HiltModules;
 import com.mycaruae.app.feature.maintenance.MaintenanceDetailViewModel_HiltModules;
 import com.mycaruae.app.feature.maintenance.MaintenanceHistoryViewModel_HiltModules;
@@ -177,6 +179,8 @@ public final class MyCarUaeApp_HiltComponents {
           DashboardViewModel_HiltModules.KeyModule.class,
           HiltWrapper_ActivityRetainedComponentManager_LifecycleModule.class,
           HiltWrapper_SavedStateHandleModule.class,
+          InsuranceAddViewModel_HiltModules.KeyModule.class,
+          InsuranceListViewModel_HiltModules.KeyModule.class,
           MaintenanceAddViewModel_HiltModules.KeyModule.class,
           MaintenanceDetailViewModel_HiltModules.KeyModule.class,
           MaintenanceHistoryViewModel_HiltModules.KeyModule.class,
@@ -228,6 +232,8 @@ public final class MyCarUaeApp_HiltComponents {
           AuthViewModel_HiltModules.BindsModule.class,
           DashboardViewModel_HiltModules.BindsModule.class,
           HiltWrapper_HiltViewModelFactory_ViewModelModule.class,
+          InsuranceAddViewModel_HiltModules.BindsModule.class,
+          InsuranceListViewModel_HiltModules.BindsModule.class,
           MaintenanceAddViewModel_HiltModules.BindsModule.class,
           MaintenanceDetailViewModel_HiltModules.BindsModule.class,
           MaintenanceHistoryViewModel_HiltModules.BindsModule.class,

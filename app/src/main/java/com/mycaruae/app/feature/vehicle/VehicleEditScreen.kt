@@ -102,7 +102,13 @@ fun VehicleEditScreen(
         if (state.isSaved) onNavigateBack()
     }
     LaunchedEffect(state.isDeleted) {
-        if (state.isDeleted) onVehicleDeleted()
+        if (state.isDeleted) {
+            if (state.hasRemainingVehicles) {
+                onNavigateBack()
+            } else {
+                onVehicleDeleted()
+            }
+        }
     }
 
     if (state.showDeleteConfirm) {

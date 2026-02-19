@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
@@ -30,45 +32,53 @@ class ReminderWorker @AssistedInject constructor(
             val userData = userPreferences.userData.first()
             if (!userData.isLoggedIn) return Result.success()
 
-            val vehicle = vehicleRepository.getVehicle(userData.userId).first()
-                ?: return Result.success()
+            val vehicles = vehicleRepository.getAllVehicles(userData.userId).first()
+            if (vehicles.isEmpty()) return Result.success()
 
-            val reminders = reminderRepository.getAll(vehicle.id).first()
             val now = System.currentTimeMillis()
 
-            // Find pending reminders that are due
-            reminders
-                .filter { it.status == "PENDING" && it.dueDate != null && it.dueDate <= now }
-                .forEach { reminder ->
-                    val notificationId = reminder.id.hashCode()
+            vehicles.forEach { vehicle ->
+                val reminders = reminderRepository.getAll(vehicle.id).first()
 
-                    when {
-                        reminder.type == "REGISTRATION" -> {
-                            notificationHelper.showRegistrationReminder(
-                                title = "Registration Reminder",
-                                body = reminder.title,
-                                notificationId = notificationId,
-                            )
+                val plate = vehicle.plateNumber ?: ""
+                val vehicleLabel = "${vehicle.modelId} ${vehicle.year}" +
+                        if (plate.isNotBlank()) " • $plate" else ""
+
+                reminders
+                    .filter { it.status == "PENDING" && it.dueDate != null && it.dueDate <= now }
+                    .forEach { reminder ->
+                        val notificationId = reminder.id.hashCode()
+
+                        when (reminder.type) {
+                            "REGISTRATION" -> {
+                                notificationHelper.showRegistrationReminder(
+                                    title = "Registration Reminder",
+                                    body = reminder.title,
+                                    notificationId = notificationId,
+                                    vehicleLabel = vehicleLabel,
+                                )
+                            }
+                            "INSPECTION" -> {
+                                notificationHelper.showInspectionReminder(
+                                    title = "Inspection Reminder",
+                                    body = reminder.title,
+                                    notificationId = notificationId,
+                                    vehicleLabel = vehicleLabel,
+                                )
+                            }
+                            else -> {
+                                notificationHelper.showMaintenanceReminder(
+                                    title = "Maintenance Reminder",
+                                    body = reminder.title,
+                                    notificationId = notificationId,
+                                    vehicleLabel = vehicleLabel,
+                                )
+                            }
                         }
-                        reminder.type == "INSPECTION" -> {
-                            notificationHelper.showInspectionReminder(
-                                title = "Inspection Reminder",
-                                body = reminder.title,
-                                notificationId = notificationId,
-                            )
-                        }
-                        else -> {
-                            notificationHelper.showMaintenanceReminder(
-                                title = "Maintenance Reminder",
-                                body = reminder.title,
-                                notificationId = notificationId,
-                            )
-                        }
+
+                        reminderRepository.completeReminder(reminder)
                     }
-
-                    // Mark as completed after showing
-                    reminderRepository.completeReminder(reminder)
-                }
+            }
 
             Result.success()
         } catch (e: Exception) {
@@ -88,6 +98,15 @@ class ReminderWorker @AssistedInject constructor(
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 WORK_NAME,
                 ExistingPeriodicWorkPolicy.KEEP,
+                request,
+            )
+        }
+
+        fun runNow(context: Context) {
+            val request = OneTimeWorkRequestBuilder<ReminderWorker>().build()
+            WorkManager.getInstance(context).enqueueUniqueWork(
+                "reminder_check_now",
+                ExistingWorkPolicy.REPLACE,
                 request,
             )
         }
