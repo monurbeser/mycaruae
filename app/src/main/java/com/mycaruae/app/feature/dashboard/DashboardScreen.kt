@@ -20,14 +20,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -38,12 +39,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -55,7 +59,11 @@ import com.mycaruae.app.ui.components.CocTopBar
 import com.mycaruae.app.ui.components.EmptyScreen
 import com.mycaruae.app.ui.components.LoadingScreen
 import com.mycaruae.app.ui.components.StatusCard
+import com.mycaruae.app.ui.theme.Amber80
 import com.mycaruae.app.ui.theme.CocIcons
+import com.mycaruae.app.ui.theme.Navy10
+import com.mycaruae.app.ui.theme.Navy20
+import com.mycaruae.app.ui.theme.Navy30
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -73,32 +81,32 @@ fun DashboardScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
-    Scaffold(
-        topBar = {
-            CocTopBar(
-                title = if (state.userName.isNotBlank()) "Hi, ${state.userName}" else "Dashboard",
-                actionIcon = CocIcons.Settings,
-            )
-        },
-    ) { padding ->
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background),
+    ) {
+        // Premium header
+        CocTopBar(
+            title = if (state.userName.isNotBlank()) "Hi, ${state.userName}" else "Dashboard",
+            actionIcon = CocIcons.Settings,
+        )
+
         when {
-            state.isLoading -> {
-                LoadingScreen(modifier = Modifier.padding(padding))
-            }
+            state.isLoading -> LoadingScreen()
             !state.hasVehicle -> {
                 EmptyScreen(
                     title = "No vehicle yet",
                     description = "Add your first vehicle to start tracking registration, inspection, and maintenance.",
                     actionLabel = "Add Vehicle",
                     onAction = onNavigateToVehicleAdd,
-                    modifier = Modifier.padding(padding),
                 )
             }
             else -> {
                 PullToRefreshBox(
                     isRefreshing = state.isRefreshing,
                     onRefresh = viewModel::refresh,
-                    modifier = Modifier.padding(padding),
+                    modifier = Modifier.fillMaxSize(),
                 ) {
                     DashboardPager(
                         state = state,
@@ -139,12 +147,11 @@ private fun DashboardPager(
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        // Page indicator dots
         if (state.vehiclePages.size > 1) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp),
+                    .padding(vertical = 12.dp),
                 horizontalArrangement = Arrangement.Center,
             ) {
                 state.vehiclePages.forEachIndexed { index, _ ->
@@ -157,7 +164,7 @@ private fun DashboardPager(
                                 if (index == pagerState.currentPage)
                                     MaterialTheme.colorScheme.primary
                                 else
-                                    MaterialTheme.colorScheme.outlineVariant
+                                    MaterialTheme.colorScheme.outlineVariant,
                             ),
                     )
                 }
@@ -168,9 +175,8 @@ private fun DashboardPager(
             state = pagerState,
             modifier = Modifier.fillMaxSize(),
         ) { page ->
-            val data = state.vehiclePages[page]
             VehiclePage(
-                data = data,
+                data = state.vehiclePages[page],
                 onMileageClick = onMileageClick,
                 onMileageHistoryClick = onMileageHistoryClick,
                 onMaintenanceClick = onMaintenanceClick,
@@ -199,18 +205,19 @@ private fun VehiclePage(
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = 20.dp),
     ) {
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
-        // Vehicle Card
+        // ── Vehicle Hero Card ──
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-            ),
+            shape = RoundedCornerShape(20.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         ) {
-            Column(modifier = Modifier.padding(20.dp)) {
+            Column {
+                // Photo
                 val firstPhoto = vehicle.photoUris
                     ?.split(",")
                     ?.firstOrNull()
@@ -222,116 +229,70 @@ private fun VehiclePage(
                         contentDescription = "Vehicle photo",
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(160.dp)
-                            .clip(RoundedCornerShape(12.dp)),
+                            .height(180.dp)
+                            .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)),
                         contentScale = ContentScale.Crop,
                     )
+                }
+
+                Column(modifier = Modifier.padding(20.dp)) {
+                    // Title + edit
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = "${data.brandName} ${vehicle.modelId}",
+                                style = MaterialTheme.typography.headlineSmall.copy(
+                                    fontWeight = FontWeight.Bold,
+                                ),
+                                color = MaterialTheme.colorScheme.onSurface,
+                            )
+                            Text(
+                                text = "${vehicle.year} • ${data.emirateName}",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                        }
+                        IconButton(onClick = onEditClick) {
+                            Icon(
+                                imageVector = CocIcons.Edit,
+                                contentDescription = "Edit",
+                                tint = MaterialTheme.colorScheme.primary,
+                            )
+                        }
+                    }
+
                     Spacer(modifier = Modifier.height(12.dp))
-                }
 
-                // Title + edit
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = "${data.brandName} ${vehicle.modelId}",
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.weight(1f),
-                    )
-                    IconButton(onClick = onEditClick) {
-                        Icon(
-                            imageVector = CocIcons.Edit,
-                            contentDescription = "Edit vehicle",
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
-                        )
-                    }
-                }
-
-                // Year + Emirate
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        imageVector = CocIcons.Calendar,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp),
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "${vehicle.year}",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
-                    )
-
-                    Spacer(modifier = Modifier.width(16.dp))
-                    Icon(
-                        imageVector = CocIcons.Info,
-                        contentDescription = null,
-                        modifier = Modifier.size(16.dp),
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = data.emirateName,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
-                    )
-                }
-
-                // Plate number
-                if (!vehicle.plateNumber.isNullOrBlank()) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = CocIcons.Car,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp),
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = vehicle.plateNumber,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
-                        )
-                    }
-                }
-
-                // Mileage
-                if (vehicle.currentMileage > 0) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            imageVector = CocIcons.Mileage,
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp),
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = "%,d km".format(vehicle.currentMileage),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
-                        )
-                    }
-                }
-
-                // Color
-                if (!vehicle.color.isNullOrBlank()) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = "🎨",
-                            style = MaterialTheme.typography.bodyMedium,
-                            modifier = Modifier.size(16.dp),
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = vehicle.color,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.7f),
-                        )
+                    // Info chips row
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    ) {
+                        if (!vehicle.plateNumber.isNullOrBlank()) {
+                            InfoChip(
+                                icon = CocIcons.Car,
+                                text = vehicle.plateNumber,
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
+                        if (vehicle.currentMileage > 0) {
+                            InfoChip(
+                                icon = CocIcons.Mileage,
+                                text = "%,d km".format(vehicle.currentMileage),
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
+                        if (!vehicle.color.isNullOrBlank()) {
+                            InfoChip(
+                                icon = null,
+                                text = vehicle.color,
+                                prefix = "🎨",
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
                     }
                 }
             }
@@ -339,13 +300,13 @@ private fun VehiclePage(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        // Status
+        // ── Expiry Status ──
         Text(
-            text = "Status",
-            style = MaterialTheme.typography.titleMedium,
+            text = "Expiry Status",
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
             color = MaterialTheme.colorScheme.onBackground,
         )
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         StatusCard(
             title = "Registration",
@@ -353,22 +314,21 @@ private fun VehiclePage(
             expiryDateFormatted = dateFormatter.format(Date(vehicle.registrationExpiry)),
         )
         Spacer(modifier = Modifier.height(8.dp))
-
         StatusCard(
             title = "Inspection",
             daysRemaining = data.inspectionDaysLeft,
             expiryDateFormatted = dateFormatter.format(Date(vehicle.inspectionExpiry)),
         )
 
-        // Mileage Chart
+        // ── Mileage Chart ──
         if (data.recentMileage.size >= 2) {
             Spacer(modifier = Modifier.height(24.dp))
             Text(
                 text = "Mileage Trend",
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
                 color = MaterialTheme.colorScheme.onBackground,
             )
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             MileageChart(
                 entries = data.recentMileage,
                 modifier = Modifier
@@ -379,71 +339,139 @@ private fun VehiclePage(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Quick Actions
+        // ── Quick Actions ──
         Text(
             text = "Quick Actions",
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
             color = MaterialTheme.colorScheme.onBackground,
         )
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(10.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(10.dp),
         ) {
-            OutlinedButton(
+            QuickActionCard(
+                icon = CocIcons.Mileage,
+                label = "Mileage",
                 onClick = onMileageClick,
                 modifier = Modifier.weight(1f),
-            ) {
-                Icon(CocIcons.Mileage, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(modifier = Modifier.width(6.dp))
-                Text("Mileage")
-            }
-            OutlinedButton(
+            )
+            QuickActionCard(
+                icon = CocIcons.Maintenance,
+                label = "Service",
                 onClick = onMaintenanceClick,
                 modifier = Modifier.weight(1f),
-            ) {
-                Icon(CocIcons.Maintenance, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(modifier = Modifier.width(6.dp))
-                Text("Service")
-            }
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            OutlinedButton(
+            )
+            QuickActionCard(
+                icon = CocIcons.Reminders,
+                label = "Remind",
                 onClick = onReminderClick,
                 modifier = Modifier.weight(1f),
-            ) {
-                Icon(CocIcons.Reminders, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(modifier = Modifier.width(6.dp))
-                Text("Reminder")
-            }
-            OutlinedButton(
+            )
+            QuickActionCard(
+                icon = CocIcons.ChevronRight,
+                label = "KM Log",
                 onClick = onMileageHistoryClick,
                 modifier = Modifier.weight(1f),
-            ) {
-                Icon(CocIcons.ChevronRight, contentDescription = null, modifier = Modifier.size(18.dp))
-                Spacer(modifier = Modifier.width(6.dp))
-                Text("KM Log")
-            }
+            )
         }
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(12.dp))
 
         // Add Vehicle
-        OutlinedButton(
+        FilledTonalButton(
             onClick = onAddVehicle,
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().height(48.dp),
+            shape = RoundedCornerShape(12.dp),
         ) {
             Icon(CocIcons.Add, contentDescription = null, modifier = Modifier.size(18.dp))
-            Spacer(modifier = Modifier.width(6.dp))
+            Spacer(modifier = Modifier.width(8.dp))
             Text("Add Vehicle")
         }
 
         Spacer(modifier = Modifier.height(24.dp))
+    }
+}
+
+@Composable
+private fun InfoChip(
+    icon: androidx.compose.ui.graphics.vector.ImageVector?,
+    text: String,
+    modifier: Modifier = Modifier,
+    prefix: String? = null,
+) {
+    Card(
+        modifier = modifier,
+        shape = RoundedCornerShape(10.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
+        ),
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            if (prefix != null) {
+                Text(text = prefix, style = MaterialTheme.typography.labelSmall)
+                Spacer(modifier = Modifier.width(4.dp))
+            }
+            if (icon != null) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(14.dp),
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+            }
+            Text(
+                text = text,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 1,
+            )
+        }
+    }
+}
+
+@Composable
+private fun QuickActionCard(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Card(
+        onClick = onClick,
+        modifier = modifier.height(80.dp),
+        shape = RoundedCornerShape(14.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                modifier = Modifier.size(24.dp),
+                tint = MaterialTheme.colorScheme.primary,
+            )
+            Spacer(modifier = Modifier.height(6.dp))
+            Text(
+                text = label,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
+            )
+        }
     }
 }
 
@@ -463,9 +491,9 @@ private fun MileageChart(
 
     Card(
         modifier = modifier,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Canvas(
             modifier = Modifier
@@ -485,7 +513,6 @@ private fun MileageChart(
             val chartWidth = size.width - leftPadding - 8f
             val chartHeight = size.height - bottomPadding - topPadding
 
-            // Grid lines (3 horizontal)
             for (i in 0..2) {
                 val y = topPadding + chartHeight * (1f - i / 2f)
                 drawLine(
@@ -507,15 +534,14 @@ private fun MileageChart(
                 )
             }
 
-            // Data points & line
             val path = Path()
-            val points: List<Offset> = values.mapIndexed { index: Int, value: Float ->
+            val points = values.mapIndexed { index, value ->
                 val x = leftPadding + (index.toFloat() / (values.size - 1)) * chartWidth
                 val y = topPadding + chartHeight * (1f - (value - minVal) / range)
                 Offset(x, y)
             }
 
-            points.forEachIndexed { index: Int, point: Offset ->
+            points.forEachIndexed { index, point ->
                 if (index == 0) path.moveTo(point.x, point.y)
                 else path.lineTo(point.x, point.y)
             }
@@ -526,19 +552,12 @@ private fun MileageChart(
                 style = Stroke(width = 3f, cap = StrokeCap.Round, join = StrokeJoin.Round),
             )
 
-            // Dots
-            points.forEach { point: Offset ->
+            points.forEach { point ->
                 drawCircle(color = dotColor, radius = 5f, center = point)
             }
 
-            // Date labels (first and last only to avoid overlap)
-            val labelIndices = if (sorted.size > 2) {
-                listOf(0, sorted.size - 1)
-            } else {
-                listOf(0, sorted.size - 1)
-            }.distinct()
-
-            labelIndices.forEach { idx: Int ->
+            val labelIndices = listOf(0, sorted.size - 1).distinct()
+            labelIndices.forEach { idx ->
                 val x = leftPadding + (idx.toFloat() / (values.size - 1)) * chartWidth
                 val dateText = dateFormatter.format(Date(sorted[idx].recordedDate))
                 val result = textMeasurer.measure(dateText, labelStyle)

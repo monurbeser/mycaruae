@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="seed">#1565C0</color>
-    <string name="app_name">My Car UAE</string>
+    <string name="app_name">My Car Tracker</string>
     <string name="auth_confirm_password">Confirm Password</string>
     <string name="auth_email">Email</string>
     <string name="auth_forgot_password">Forgot Password?</string>
